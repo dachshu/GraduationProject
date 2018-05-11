@@ -12,6 +12,9 @@ import argparse
 import konlpy
 import json
 
+# 느리고 성능이 안 좋은듯. Mecab 설치?
+TAGGER = konlpy.tag.Kkma()
+
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("mode", choices=['space', 'morpheme'], help="choice separating mode")
@@ -43,7 +46,19 @@ def parse_by_space(input_file):
     return tokens
 
 def parse_by_morpheme(input_file):
-    pass
+    inputs = json.load(input_file)
+
+    tokens = []
+    for inp in inputs:
+        title = remove_useless_data(inp['title'])
+        title = [tag[0] for tag in TAGGER.pos(title)]
+        title = ' '.join(title)
+        comments = [remove_useless_data(cmt) for cmt in inp['comments']]
+        comments = [[tag[0] for tag in TAGGER.pos(cmt)] for cmt in comments]
+        comments = [' '.join(cmt) for cmt in comments]
+        tokens.append((title, comments))
+
+    return tokens
 
 if __name__ == "__main__":
     args = parse_arguments()
