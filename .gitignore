@@ -1,0 +1,3 @@
+DaumFilter/output/*
+DaumFilter/*.txt
+char-rnn-tensorflow/*
