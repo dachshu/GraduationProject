@@ -2,3 +2,4 @@
 *.comment
 *.title
 *.json
+output/*
