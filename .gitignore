@@ -1,3 +1,5 @@
 nmt/save/*
 nmt/train/*
 nmt/logs/*
+wordvec_training/save/*
+wordvec_training/*.txt
