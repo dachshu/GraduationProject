@@ -11,6 +11,7 @@ import os
 import argparse
 import konlpy
 import json
+import random
 
 # 느리고 성능이 안 좋은듯. Mecab 설치?
 TAGGER = konlpy.tag.Kkma()
@@ -24,6 +25,7 @@ def parse_arguments():
     parser.add_argument("--separate_title", action='store_true', help="with this, output will be separated in two parts, title and comment.")
     parser.add_argument("--title_suffix", type=str, default='title', help="suffix of title output file. if '--separate_title' option is not set, this option is ignored")
     parser.add_argument("--comment_suffix", type=str, default='comment', help="suffix of comment output file. if '--separate_title' option is not set, this option is ignored")
+    parser.add_argument("--vocab_suffix", type=str, default='vocab', help="suffix of vocab output file.")
     return parser.parse_args()
 
 def remove_useless_data(sentence):
@@ -79,7 +81,8 @@ if __name__ == "__main__":
 
         for r in result:
             # comment 수만큼 title을 복사해서 write
-            title_out.write('\n'.join([''.join(r[0])]*len(r[1])))
+            title = [' '.join([str(random.randrange(1,500000)), r[0]]) for _ in range(len(r[1]))]
+            title_out.write('\n'.join(title))
             comment_out.write('\n'.join(r[1]))
 
             # 마지막 요소를 제외하고는 개행
@@ -88,15 +91,30 @@ if __name__ == "__main__":
                 comment_out.write('\n')
 
     else:
-        output_path = os.path.join(args.out_dir, args.out_base_name)
+        output_path = os.path.join(args.out_dir, args.out_base_name + '.txt')
         
         out_file = open(output_path, 'w', encoding='utf-8')
 
         for r in result:
-            title = ''.join(r[0])
-            lines = [title + ' ' + ''.join(cmt) for cmt in r[1]]
+            title = r[0]
+            lines = [title + ' ' + cmt for cmt in r[1]]
 
             out_file.write('\n'.join(lines))
 
             if r != result[-1]:
                 out_file.write('\n')
+
+    vocab_path = os.path.join(args.out_dir, args.out_base_name + '.' + args.vocab_suffix)
+
+    vocab = set()
+    # 어휘 목록에 추가
+    for r in result:
+        for w in r[0].split():
+            vocab.add(w)
+        for cmt in r[1]:
+            for w in cmt.split():
+                vocab.add(w)
+
+    vocab_file = open(vocab_path, 'w', encoding='utf-8')
+    vocab_file.write('<unk>\n<s>\n</s>\n')
+    vocab_file.write('\n'.join(vocab))
