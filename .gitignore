@@ -1,2 +1,3 @@
 nmt/save/*
 nmt/train/*
+nmt/logs/*
