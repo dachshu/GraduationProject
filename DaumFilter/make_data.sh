@@ -1,15 +1,11 @@
 #!/bin/bash
 
-ARCHIVE_DIR=/home/cjy/GraduationProject/crawler/crawled_data/daum_news
+SCRIPT_DIR=$(cd $(dirname $0) && pwd)
+OUT_DIR=${SCRIPT_DIR}/output
+OUT_JSON_NAME=${OUT_DIR}/output.json
 
-ARCHIVE_DAYS_DIR=$(find "${ARCHIVE_DIR}"/* -type d)
-
-for ARCHIVES_DIR in ${ARCHIVE_DAYS_DIR}; do
-    #echo ${ARCHIVES_DIR##*/}
-    DIR_NAME=${ARCHIVES_DIR##*/}
-    mkdir -p ./output/${DIR_NAME}
-    ./filter.py ${ARCHIVES_DIR} -o ./output/${DIR_NAME}/output.json
-    cd ./output/${DIR_NAME}
-    python3 ../../process_data.py "output.json" && sed -i '/^$/d' *.txt && ../../seperate_dataset.py title.txt comment.txt
-    cd - > /dev/null
-done
+mkdir -p ${OUT_DIR}
+./filter.py ${ARCHIVES_DIR} -o ${OUT_JSON_NAME} 0<&0
+./make_training_input.py space ${OUT_JSON_NAME} --out_dir ${OUT_DIR} --separate_title
+./separate_dataset.py ${OUT_DIR}/output.title ${OUT_DIR}/output.comment ${OUT_DIR}/output.vocab --out_dir ${OUT_DIR}
+cp -f ${OUT_DIR}/*.title ${OUT_DIR}/*.comment -t ${SCRIPT_DIR}/../nmt/train
