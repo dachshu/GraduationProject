@@ -1,6 +1,6 @@
 import argparse
 import time
-import twitter
+# import twitter
 import sample
 import DaumIssueCrawler
 import time_generate
@@ -16,7 +16,7 @@ class TweetUploader:
             remaining_sec = time_generate.get_next_remaining_seconds()
             print(remaining_sec, 'sleep')
 #time.sleep(remaining_sec)
-            time.sleep(3600)
+            time.sleep(5)
             
             issue_crawler = DaumIssueCrawler.DaumIssueCrawler()
             issue_word = issue_crawler.get_issue_word()
@@ -25,11 +25,12 @@ class TweetUploader:
             print('text :' + text)
 
             #upload
-            api = twitter.Api(consumer_key='zexHhvrrG45tSLsKQTySJ0FKG',
-                    consumer_secret='OxsUkRcArkimr6fO9TdAvjhcDfrgwvzW0YytybRMs6WNUkIAlA', 
-                    access_token_key='903173915811254272-Otqw7io4GiqOtq5LIMW8nPDOTP9EDIb',
-                    access_token_secret='0q8jbHXgNhbpsFyJnfkxJA9g0om7MW6yF0pyjagAZF8kt')
-            status = api.PostUpdate(text)
+            # api = twitter.Api(consumer_key='zexHhvrrG45tSLsKQTySJ0FKG',
+                    # consumer_secret='OxsUkRcArkimr6fO9TdAvjhcDfrgwvzW0YytybRMs6WNUkIAlA', 
+                    # access_token_key='903173915811254272-Otqw7io4GiqOtq5LIMW8nPDOTP9EDIb',
+                    # access_token_secret='0q8jbHXgNhbpsFyJnfkxJA9g0om7MW6yF0pyjagAZF8kt')
+            # status = api.PostUpdate(text)
+            print(text)
             time_generate.update_log()
             issue_crawler = None
 

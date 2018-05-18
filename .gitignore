@@ -5,3 +5,4 @@ nmt/*.txt
 wordvec_training/save/*
 wordvec_training/*.txt
 **/Session.vim
+kor-char-rnn-tensorflow/*log
