@@ -72,6 +72,7 @@ if __name__ == "__main__":
     if not os.path.isdir(args.out_dir):
         os.makedirs(args.out_dir)
 
+    vocab = set()
     if args.separate_title:
         title_path = os.path.join(args.out_dir, args.out_base_name + '.' + args.title_suffix)
         comment_path = os.path.join(args.out_dir, args.out_base_name + '.' + args.comment_suffix)
@@ -81,7 +82,8 @@ if __name__ == "__main__":
 
         for r in result:
             # comment 수만큼 title을 복사해서 write
-            title = [' '.join([str(random.randrange(1,500000)), r[0]]) for _ in range(len(r[1]))]
+            rand_nums = [str(random.randrange(1, 500000)) for _ in range(len(r[1]))]
+            title = [' '.join([rand_nums[i], r[0]]) for i in range(len(r[1]))]
             title_out.write('\n'.join(title))
             comment_out.write('\n'.join(r[1]))
 
@@ -89,6 +91,11 @@ if __name__ == "__main__":
             if r != result[-1]:
                 title_out.write('\n')
                 comment_out.write('\n')
+
+            vocab.update(rand_nums)
+            vocab.update(r[0].split())
+            for cmt in r[1]:
+                vocab.update(cmt.split())
 
     else:
         output_path = os.path.join(args.out_dir, args.out_base_name + '.txt')
@@ -104,16 +111,11 @@ if __name__ == "__main__":
             if r != result[-1]:
                 out_file.write('\n')
 
-    vocab_path = os.path.join(args.out_dir, args.out_base_name + '.' + args.vocab_suffix)
+            vocab.update(r[0].split())
+            for cmt in r[1]:
+                vocab.update(cmt.split())
 
-    vocab = set()
-    # 어휘 목록에 추가
-    for r in result:
-        for w in r[0].split():
-            vocab.add(w)
-        for cmt in r[1]:
-            for w in cmt.split():
-                vocab.add(w)
+    vocab_path = os.path.join(args.out_dir, args.out_base_name + '.' + args.vocab_suffix)
 
     vocab_file = open(vocab_path, 'w', encoding='utf-8')
     vocab_file.write('<unk>\n<s>\n</s>\n')
