@@ -6,3 +6,6 @@ wordvec_training/save/*
 wordvec_training/*.txt
 **/Session.vim
 kor-char-rnn-tensorflow/*log
+char-rnn-tensorflow/*.txt
+char-rnn-tensorflow/output/
+char-rnn-tensorflow/data/
