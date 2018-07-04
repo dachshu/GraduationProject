@@ -74,6 +74,7 @@ class DaumCrawler:
                         err_file.write(log_text)
                 finally:
                     self.browser.quit()
+                    self.browser = webdriver.Firefox()
 
         except Exception as e:
             with open("error.log", 'a') as err_file:
