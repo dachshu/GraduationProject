@@ -96,9 +96,12 @@ def train():
     # 세션을 열고 학습을 진행합니다.
     with tf.Session() as sess:
         # 변수들에 초기값을 할당합니다.
-        sess.run(tf.global_variables_initializer())
-
         saver = tf.train.Saver(tf.global_variables())
+        latest_check_point = tf.train.latest_check_point(output_dir)
+        if latest_check_point is None:
+            sess.run(tf.global_variables_initializer())
+        else:
+            saver.restore(sess, latest_check_point)
 
         for e in range(num_epochs):
             data_loader.reset_batch_pointer()
