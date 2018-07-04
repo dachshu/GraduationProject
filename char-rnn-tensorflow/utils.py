@@ -16,12 +16,13 @@ class TextLoader():
         vocab_file = os.path.join(data_dir, "vocab.pkl")
         tensor_file = os.path.join(data_dir, "data.npy")
 
-        if not (os.path.exists(vocab_file) and os.path.exists(tensor_file)):
+        #if not (os.path.exists(vocab_file) and os.path.exists(tensor_file)):
+        if not (os.path.exists(vocab_file)):
             print("reading text file")
             self.preprocess(input_file, vocab_file, tensor_file)
         else:
             print("loading preprocessed files")
-            self.load_preprocessed(vocab_file, tensor_file)
+            self.load_preprocessed(input_file, vocab_file, tensor_file)
         self.create_batches()
         self.reset_batch_pointer()
 
@@ -39,14 +40,23 @@ class TextLoader():
         self.tensor = np.array(list(map(self.vocab.get, data)))
         np.save(tensor_file, self.tensor)
 
-    def load_preprocessed(self, vocab_file, tensor_file):
+    def load_preprocessed(self, input_file, vocab_file, tensor_file):
+        with codecs.open(input_file, "r", encoding=self.encoding) as f:
+            data = f.read()
         with open(vocab_file, 'rb') as f:
             self.chars = cPickle.load(f)
         self.vocab_size = len(self.chars)
         self.vocab = dict(zip(self.chars, range(len(self.chars))))
-        self.tensor = np.load(tensor_file)
-        self.num_batches = int(self.tensor.size / (self.batch_size *
-                                                   self.seq_length))
+        ts = list()
+        for ch in data:
+            val = self.vocab.get(ch)
+            if None != val:
+                ts.append(val)
+            else: print(ch)
+        #self.tensor = np.array(list(map(self.vocab.get, data)))
+        self.tensor = np.array(ts)
+        np.save(tensor_file, self.tensor)
+        #self.tensor = np.load(tensor_file)
 
     def create_batches(self):
         self.num_batches = int(self.tensor.size / (self.batch_size *
