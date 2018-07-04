@@ -16,13 +16,13 @@ from utils import TextLoader
 
 # 학습에 필요한 설정값들을 지정합니다.
 
-data_dir = 'data/news'
-output_dir = './output'
-checkpoint_path = os.path.join(output_dir, 'model.ckpt')
+# data_dir = 'data/news'
+# output_dir = './output'
+# checkpoint_path = os.path.join(output_dir, 'model.ckpt')
 
-#data_dir = 'data/tinyshakespeare' # 셰익스피어 희곡 <리처드 3세> 데이터로 학습
-#output_dir = './testoutput'
-#checkpoint_path = os.path.join(output_dir, 'model.ckpt')
+data_dir = 'data/tinyshakespeare' # 셰익스피어 희곡 <리처드 3세> 데이터로 학습
+output_dir = './testoutput'
+checkpoint_path = os.path.join(output_dir, 'model.ckpt')
 
 #data_dir = 'data/linux' # <Linux 소스코드> 데이터로 학습
 batch_size = 50 # Training : 50, Sampling : 1
@@ -97,11 +97,12 @@ def train():
     with tf.Session() as sess:
         # 변수들에 초기값을 할당합니다.
         saver = tf.train.Saver(tf.global_variables())
-        latest_check_point = tf.train.latest_check_point(output_dir)
+        latest_check_point = tf.train.latest_checkpoint(output_dir)
         if latest_check_point is None:
             sess.run(tf.global_variables_initializer())
         else:
             saver.restore(sess, latest_check_point)
+            print("model restored from latest_check_point")
 
         for e in range(num_epochs):
             data_loader.reset_batch_pointer()
