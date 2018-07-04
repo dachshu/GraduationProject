@@ -15,10 +15,15 @@ import argparse
 from utils import TextLoader
 
 # 학습에 필요한 설정값들을 지정합니다.
+
 data_dir = 'data/news'
 output_dir = './output'
 checkpoint_path = os.path.join(output_dir, 'model.ckpt')
+
 #data_dir = 'data/tinyshakespeare' # 셰익스피어 희곡 <리처드 3세> 데이터로 학습
+#output_dir = './testoutput'
+#checkpoint_path = os.path.join(output_dir, 'model.ckpt')
+
 #data_dir = 'data/linux' # <Linux 소스코드> 데이터로 학습
 batch_size = 50 # Training : 50, Sampling : 1
 seq_length = 50 # Training : 50, Sampling : 1
@@ -132,7 +137,7 @@ def train():
         print("샘플링을 시작합니다!")
         num_sampling = 4000  # 생성할 글자(Character)의 개수를 지정합니다. 
         prime = u' '         # 시작 글자를 ' '(공백)으로 지정합니다.
-        sampling_type = 1    # 샘플링 타입을 설정합니다.
+        sampling_type = 0    # 샘플링 타입을 설정합니다.
         state = sess.run(cell.zero_state(1, tf.float32)) # RNN의 최초 state값을 0으로 초기화합니다.
 
         # Random Sampling을 위한 weighted_pick 함수를 정의합니다.
@@ -178,7 +183,7 @@ def train():
 
 def sample(prime):
     num_sampling = 4000  # 생성할 글자(Character)의 개수를 지정합니다. 
-    sampling_type = 2    # 샘플링 타입을 설정합니다.
+    sampling_type = 2 # 샘플링 타입을 설정합니다.
 
     with tf.Session() as sess:
         tf.global_variables_initializer().run()
@@ -261,7 +266,7 @@ if __name__ == "__main__":
         train()
     else:
         if args.input_file is None:
-            sample(args.prime)
+            print(sample(args.prime))
 
         else:
             output_list = [sample(inp.strip()) for inp in args.input_file.readlines()]
