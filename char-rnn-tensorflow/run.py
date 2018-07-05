@@ -94,7 +94,9 @@ def train():
         os.makedirs(output_dir)
 
     # 세션을 열고 학습을 진행합니다.
-    with tf.Session() as sess:
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    with tf.Session(config=config) as sess:
         # 변수들에 초기값을 할당합니다.
         saver = tf.train.Saver(tf.global_variables())
         latest_check_point = tf.train.latest_checkpoint(output_dir)
@@ -138,52 +140,52 @@ def train():
         
 
         # 샘플링 시작
-        print("샘플링을 시작합니다!")
-        num_sampling = 4000  # 생성할 글자(Character)의 개수를 지정합니다. 
-        prime = u' '         # 시작 글자를 ' '(공백)으로 지정합니다.
-        sampling_type = 0    # 샘플링 타입을 설정합니다.
-        state = sess.run(cell.zero_state(1, tf.float32)) # RNN의 최초 state값을 0으로 초기화합니다.
+        #print("샘플링을 시작합니다!")
+        #num_sampling = 4000  # 생성할 글자(Character)의 개수를 지정합니다. 
+        #prime = u' '         # 시작 글자를 ' '(공백)으로 지정합니다.
+        #sampling_type = 0    # 샘플링 타입을 설정합니다.
+        #state = sess.run(cell.zero_state(1, tf.float32)) # RNN의 최초 state값을 0으로 초기화합니다.
 
         # Random Sampling을 위한 weighted_pick 함수를 정의합니다.
-        def weighted_pick(weights):
-            t = np.cumsum(weights)
-            s = np.sum(weights)
-            return(int(np.searchsorted(t, np.random.rand(1)*s)))
+        #def weighted_pick(weights):
+        #    t = np.cumsum(weights)
+        #    s = np.sum(weights)
+        #    return(int(np.searchsorted(t, np.random.rand(1)*s)))
 
-        ret = prime       # 샘플링 결과를 리턴받을 ret 변수에 첫번째 글자를 할당합니다.
-        char = prime[-1]   # Char-RNN의 첫번쨰 인풋을 지정합니다.  
-        for n in range(num_sampling):
-            x = np.zeros((1, 1))
-            x[0, 0] = vocab[char]
+        #ret = prime       # 샘플링 결과를 리턴받을 ret 변수에 첫번째 글자를 할당합니다.
+        #char = prime[-1]   # Char-RNN의 첫번쨰 인풋을 지정합니다.  
+        #for n in range(num_sampling):
+        #    x = np.zeros((1, 1))
+        #    x[0, 0] = vocab[char]
 
             # RNN을 한스텝 실행하고 Softmax 행렬을 리턴으로 받습니다.
-            feed_dict = {input_data: x, state_batch_size : 1, initial_state: state}
-            [probs_result, state] = sess.run([probs, final_state], feed_dict=feed_dict)         
+        #    feed_dict = {input_data: x, state_batch_size : 1, initial_state: state}
+        #    [probs_result, state] = sess.run([probs, final_state], feed_dict=feed_dict)         
 
             # 불필요한 차원을 제거합니다.
             # probs_result : (1,65) -> p : (65)
-            p = np.squeeze(probs_result)
+        #    p = np.squeeze(probs_result)
 
             # 샘플링 타입에 따라 3가지 종류로 샘플링 합니다.
             # sampling_type : 0 -> 다음 글자를 예측할때 항상 argmax를 사용
             # sampling_type : 1(defualt) -> 다음 글자를 예측할때 항상 random sampling을 사용
             # sampling_type : 2 -> 다음 글자를 예측할때 이전 글자가 ' '(공백)이면 random sampling, 그렇지 않을 경우 argmax를 사용
-            if sampling_type == 0:
-                sample = np.argmax(p)
-            elif sampling_type == 2:
-                if char == ' ':
-                    sample = weighted_pick(p)
-                else:
-                    sample = np.argmax(p)
-            else:
-                sample = weighted_pick(p)
+       #     if sampling_type == 0:
+       #         sample = np.argmax(p)
+       #     elif sampling_type == 2:
+       #         if char == ' ':
+       #             sample = weighted_pick(p)
+       #         else:
+       #             sample = np.argmax(p)
+       #     else:
+       #         sample = weighted_pick(p)
 
-            pred = chars[sample]
-            ret += pred     # 샘플링 결과에 현재 스텝에서 예측한 글자를 추가합니다. (예를들어 pred=L일 경우, ret = HEL -> HELL)
-            char = pred     # 예측한 글자를 다음 RNN의 인풋으로 사용합니다.
+        #    pred = chars[sample]
+        #    ret += pred     # 샘플링 결과에 현재 스텝에서 예측한 글자를 추가합니다. (예를들어 pred=L일 경우, ret = HEL -> HELL)
+        #    char = pred     # 예측한 글자를 다음 RNN의 인풋으로 사용합니다.
 
-        print("샘플링 결과:")
-        print(ret)
+       # print("샘플링 결과:")
+       # print(ret)
 
 def sample(prime):
     num_sampling = 4000  # 생성할 글자(Character)의 개수를 지정합니다. 
