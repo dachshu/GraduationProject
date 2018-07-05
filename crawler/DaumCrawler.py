@@ -238,3 +238,5 @@ if __name__ == '__main__':
         print("")
         for d in dt[1]:
             dc.crawl(date=d)
+    
+    dc.browser.quit()
