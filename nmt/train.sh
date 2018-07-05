@@ -4,7 +4,7 @@ SOURCE_DIR=$(cd $(dirname "$0") && pwd)
 VOLUME_DIR=/nmt
 CURR_TIME=$(date "+%F-%H-%M-%S")
 
-docker run --rm -v ${SOURCE_DIR}:${VOLUME_DIR} tensorflow/tensorflow:nightly-devel-py3 bash -c "export PYTHONIOENCODING=UTF-8 && cd /nmt && python3 -m nmt.nmt \
+nvidia-docker run --rm -v ${SOURCE_DIR}:${VOLUME_DIR} tensorflow/tensorflow:nightly-devel-gpu-py3 bash -c "export PYTHONIOENCODING=UTF-8 && cd /nmt && python3 -m nmt.nmt \
     --src=title --tgt=comment \
     --vocab_prefix=/nmt/train/vocab \
     --train_prefix=/nmt/train/train \
