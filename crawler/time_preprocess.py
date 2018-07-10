@@ -28,7 +28,11 @@ def preprocess_times(times):
     separated = reduce(_separate, int_times, [[]])
     separated = [[_time_to_sec(time, datetime.date.fromtimestamp(
         times[0])) for time in times] for times in separated]
-    return separated
+    flat_list = [-1]    # Start of Time
+    for time_list in separated:
+        flat_list += time_list
+    flat_list.append(1000000) # End of Time
+    return flat_list
 
 
 if __name__ == "__main__":
