@@ -10,3 +10,6 @@ char-rnn-tensorflow/*.txt
 char-rnn-tensorflow/output/
 char-rnn-tensorflow/data/
 .vscode
+**/__pycache__/
+CommentTimeGenerator/TimeModelOutput/
+
