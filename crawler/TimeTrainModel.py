@@ -102,7 +102,8 @@ def sample(seed):
                 x = np.zeros((1, 1, 1))
                 x[0, 0, 0] = probs_result[0][0]
 
-            print(ret)
+            for val in ret:
+                print(val)
 
 
 def parse_arguments():
