@@ -15,7 +15,7 @@ ARCHIVE_PATH = "time_archive"
 
 class DaumCrawler:
     def __init__(self):
-        #os.environ['MOZ_HEADLESS'] = '1'
+        os.environ['MOZ_HEADLESS'] = '1'
         self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(0)
         self.base_url = u'http://media.daum.net/ranking/bestreply/?regDate='
