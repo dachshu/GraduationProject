@@ -2,6 +2,8 @@ from functools import reduce
 import datetime
 import time
 
+# START_OF_TIME = -10000
+NORMALIZE_FACTOR = 24 * 60 * 60
 
 def _separate(total_time_list, t):
     last_time_list = total_time_list[-1]
@@ -9,7 +11,7 @@ def _separate(total_time_list, t):
         last_time_list.append(t)
     else:
         date_from_time = datetime.date.fromtimestamp(t)
-        date_from_last_time = datetime.date.fromtimestamp(last_time_list[-1])
+        date_from_last_time = datetime.date.fromtimestamp(last_time_list[0])
 
         if date_from_last_time.day == date_from_time.day:
             last_time_list.append(t)
@@ -23,16 +25,25 @@ def _time_to_sec(t, base_date):
     return int(t - base_time)
 
 
+def normalize(t):
+    return t/NORMALIZE_FACTOR
+
+
+def restore_normalized_time(nt):
+    return int(nt*NORMALIZE_FACTOR)
+
+
 def preprocess_times(times):
     int_times = [int(t) for t in times]
-    separated = reduce(_separate, int_times, [[]])
+    separated = reduce(_separate, int_times, [[]]) # list of sub-list of time classfied by day
     separated = [[_time_to_sec(time, datetime.date.fromtimestamp(
         times[0])) for time in times] for times in separated]
-    flat_list = [-1]    # Start of Time
+    flat_list = []
     for time_list in separated:
         flat_list += time_list
-    flat_list.append(1000000) # End of Time
-    return flat_list
+    flat_list.reverse()
+    normalized = [normalize(t) for t in flat_list]
+    return normalized
 
 
 if __name__ == "__main__":
@@ -96,4 +107,7 @@ if __name__ == "__main__":
              1524902520,
              1524869460,
              1518325260]
-    print(preprocess_times(times))
+    processed = preprocess_times(times)
+    print(processed)
+    for t in processed:
+        print(restore_normalized_time(t))
