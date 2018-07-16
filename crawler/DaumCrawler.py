@@ -11,6 +11,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+script_path = os.path.dirname(os.path.realpath(sys.argv[0]))
+
 class DaumCrawler:
     def __init__(self):
         os.environ['MOZ_HEADLESS'] = '1'
@@ -38,9 +40,9 @@ class DaumCrawler:
 
         
         for url in urls:
+            self.browser.quit()
+            self.browser = webdriver.Firefox()
             try:
-                self.browser.quit()
-                self.browser = webdriver.Firefox()
                 self.browser.get(url)
 
                 # remove vod bar
@@ -71,7 +73,7 @@ class DaumCrawler:
 
                 #write
                 json_data = json.dumps(news, ensure_ascii=False)
-                save_path = 'crawled_data/daum_news/' + str(date)
+                save_path = script_path + '/crawled_data/daum_news/' + str(date)
                 os.makedirs(save_path, exist_ok=True)
                 f = open(save_path + '/' + news['id'], 'w', encoding='utf-8')
                 f.write(json_data)
