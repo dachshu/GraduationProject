@@ -18,3 +18,5 @@ nvidia-docker run --rm -v ${SOURCE_DIR}:${VOLUME_DIR} tensorflow/tensorflow:nigh
     --dropout=0.5 \
     --share_vocab \
     --metrics=bleu | tee /nmt/logs/train-${CURR_TIME}.log"
+
+cd ${SOURCE_DIR}/save && ln -fs model-${CURR_TIME}/ model
