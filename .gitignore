@@ -13,3 +13,5 @@ char-rnn-tensorflow/data/
 **/__pycache__/
 CommentTimeGenerator/TimeModelOutput/
 
+crawler/time_archive/
+*.tgz
