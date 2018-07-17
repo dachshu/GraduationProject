@@ -16,9 +16,9 @@ checkpoint_path = os.path.join(output_dir, 'model.ckpt')
 seq_length = 10
 hidden_dim = 128 
 output_dim = 1
-learning_rate = 0.00001
+learning_rate = 0.0001
 iterations = 10
-batch_size = 2 
+batch_size = 10 
 
 data_loader = TimeLoader(data_dir, batch_size, seq_length)
 
