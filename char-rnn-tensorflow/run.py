@@ -79,7 +79,7 @@ logits = tf.matmul(output, softmax_w) + softmax_b
 probs = tf.nn.softmax(logits)
 
 # Cross Entropy 손실 함수를 정의합니다. 
-loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=target_data))
+loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=logits, labels=target_data))
 
 def train():
     # 옵티마이저를 선언하고 옵티마이저에 Gradient Clipping을 적용합니다.
@@ -271,6 +271,7 @@ if __name__ == "__main__":
     if args.mode == "train":
         train()
     else:
+        os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
         if args.input_file is None:
             print(sample(args.prime))
 
