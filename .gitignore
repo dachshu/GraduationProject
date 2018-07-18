@@ -16,3 +16,4 @@ char-rnn-tensorflow/data/
 CommentTimeGenerator/TimeModelOutput/
 crawler/time_archive/
 *.tgz
+TweetUploader/twitter_key
