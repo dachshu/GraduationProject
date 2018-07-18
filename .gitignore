@@ -6,12 +6,13 @@ wordvec_training/save/*
 wordvec_training/*.txt
 **/Session.vim
 kor-char-rnn-tensorflow/*log
+kor-char-rnn-tensorflow/data/
+kor-char-rnn-tensorflow/save/
 char-rnn-tensorflow/*.txt
 char-rnn-tensorflow/output/
 char-rnn-tensorflow/data/
 .vscode
 **/__pycache__/
 CommentTimeGenerator/TimeModelOutput/
-
 crawler/time_archive/
 *.tgz
