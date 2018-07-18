@@ -29,8 +29,8 @@ for t in ${GENERATED_TIMES}; do
     sleep ${PERIOD_TO_SLEEP}
 
     # get a news article
-    ARTICLE_TITLES=$(${SCRIPT_DIR}/GetDaumMainNews.py)
-    SELECTED_TITLE=$(echo "${ARTICLE_TITLES}" | shuf -n 1)
+    ARTICLE_TITLES_LINKS=$(${SCRIPT_DIR}/GetDaumMainNews.py)
+    SELECTED_TITLE=$(echo "${ARTICLE_TITLES_LINKS}" | awk 'NR % 2 == 1' | shuf -n 1)
     # generate comments of the article via char-rnn and seq2seq model
     echo "Generate a comment from the title: ${SELECTED_TITLE}"
     echo "${SELECTED_TITLE}" > ${CHAR_RNN_DIR}/input_for_generation.txt
@@ -41,6 +41,8 @@ for t in ${GENERATED_TIMES}; do
     ${NMT_DIR}/infer.sh ${NMT_DIR}/save/model ${NMT_DIR}/input_for_generation.txt ${NMT_DIR}/infer_output.txt
     NMT_RESULT="$(cat ${NMT_DIR}/infer_output.txt)"
     # TODO:
-    # write the result to a file
+    # upload comment and original news web link to twitter
 
 done
+
+cd ${TIME_GENERATOR_DIR} && echo "${GENERATED_TIMES}" | tail -1 > latest_generated_time
