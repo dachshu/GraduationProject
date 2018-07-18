@@ -8,19 +8,15 @@ from utils import TimeLoader
 import time_preprocess
 import argparse
 
-
-data_dir = './TimeData'
 output_dir = './TimeModelOutput'
 checkpoint_path = os.path.join(output_dir, 'model.ckpt')
 
 seq_length = 10
 hidden_dim = 128 
 output_dim = 1
-learning_rate = 0.0001
+learning_rate = 0.00001
 iterations = 10
-batch_size = 10 
-
-data_loader = TimeLoader(data_dir, batch_size, seq_length)
+batch_size = 2 
 
 X = tf.placeholder(tf.float32, [None, None, 1])
 Y = tf.placeholder(tf.float32, [None, 1])
@@ -45,6 +41,8 @@ train_op = optimizer.minimize(loss)
 
 
 def train():
+    data_dir = './TimeData'
+    data_loader = TimeLoader(data_dir, batch_size, seq_length)
     with tf.Session() as sess:
         saver = tf.train.Saver(tf.global_variables())
         latest_check_point = tf.train.latest_checkpoint(output_dir)
@@ -96,7 +94,7 @@ def sample(seed):
                 [probs_result, state] = sess.run([Y_pred, _states], feed_dict=feed_dict)
 
                 pred = time_preprocess.restore_normalized_time(probs_result[0][0])
-                if len(ret) > 0 and pred <= ret[-1]: break
+                if len(ret) > 0 and (pred <= ret[-1] or probs_result[0][0] > 1): break
                 ret.append(pred)
 
                 x = np.zeros((1, 1, 1))
