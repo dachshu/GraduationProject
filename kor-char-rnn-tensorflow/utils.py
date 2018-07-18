@@ -21,7 +21,7 @@ class TextLoader():
             self.preprocess(input_file, vocab_file, tensor_file)
         else:
             print("loading preprocessed files")
-            self.load_preprocessed(vocab_file, tensor_file)
+            self.load_preprocessed(input_file, vocab_file, tensor_file)
         self.create_batches()
         self.reset_batch_pointer()
 
@@ -38,12 +38,21 @@ class TextLoader():
         self.tensor = np.array(list(map(self.vocab.get, data)))
         np.save(tensor_file, self.tensor)
 
-    def load_preprocessed(self, vocab_file, tensor_file):
+    def load_preprocessed(self, iput_file, vocab_file, tensor_file):
         with open(vocab_file, 'rb') as f:
             self.chars = cPickle.load(f)
         self.vocab_size = len(self.chars)
         self.vocab = dict(zip(self.chars, range(len(self.chars))))
-        self.tensor = np.load(tensor_file)
+        with codecs.open(input_file, "r", encoding=self.encoding) as f:
+            data = f.read()
+        data_ = data[:]
+        for ch in data_:
+            if None == self.vocab.get(ch):
+                data = data.replace(ch, '')
+        self.tensor = np.array(list(map(self.vocab.get, data)))
+        np.save(tensor_file, self.tensor)
+        
+        #self.tensor = np.load(tensor_file)
         self.num_batches = int(self.tensor.size / (self.batch_size *
                                                    self.seq_length))
 

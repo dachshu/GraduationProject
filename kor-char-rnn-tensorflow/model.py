@@ -107,6 +107,7 @@ class Model():
             return(int(np.searchsorted(t, np.random.rand(1)*s)))
 
         ret = prime
+        ret += '\n'
         char = prime[-1]
         while True:
             x = np.zeros((1, 1))
