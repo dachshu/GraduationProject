@@ -106,8 +106,9 @@ class Model():
             s = np.sum(weights)
             return(int(np.searchsorted(t, np.random.rand(1)*s)))
 
-        ret = prime
-        ret += '\n'
+        #ret = prime
+        #ret += '\n'
+        ret = ''
         char = prime[-1]
         while True:
             x = np.zeros((1, 1))
@@ -128,6 +129,6 @@ class Model():
 
             pred = chars[sample]
             ret += pred
-            if pred == '\n' and char == '\n': break
+            if pred == '\n': break
             char = pred
         return ret
