@@ -17,6 +17,7 @@ echo -e "${CRAWLED_DATA_DIR}/${CRAWL_DATE}" | ${FILTER_DIR}/make_data.sh
 
 echo "=== Copying Filtered Data ==="
 mkdir -p ${CHAR_RNN_DIR}/data/news
+rm ${CHAR_RNN_DIR}/data/news/*
 cp ${FILTER_DIR}/output/char_rnn_data.txt ${CHAR_RNN_DIR}/data/news/input.txt
 
 # CharRNN 기존 모델 백업
