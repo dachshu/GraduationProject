@@ -224,7 +224,7 @@ def get_urls_to_crawl(crawler):
     if args.date:
         dates += args.date
 
-    print('%s will be crawled' % ','.join(dates))
+    print(dates)
     for date in dates:
         urls += crawler.get_url_from_date(date)
 
@@ -235,13 +235,21 @@ def crawl(data):
     DaumCrawler.crawl_url_and_save(webdriver.Firefox(), data[0], data[1])
 
 
+completed_num = 0
+
+def print_result(result, total_num):
+    global completed_num
+    completed_num += 1
+    print("%d/%d has done" % (completed_num, total_num))
+
 if __name__ == '__main__':
     os.environ['MOZ_HEADLESS'] = '1'
     dc = DaumCrawler()
     urls, args = get_urls_to_crawl(dc)
 
-    print(args.process_num)
     pool = Pool(processes=args.process_num)
 
     print('start crawling')
-    pool.map(crawl,urls)
+    results = [pool.apply_async(crawl, (data,), callback=lambda r: print_result(r, len(urls))) for data in urls]
+    for result in results:
+        result.wait()
