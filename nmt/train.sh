@@ -10,7 +10,7 @@ nvidia-docker run --rm -v ${SOURCE_DIR}:${VOLUME_DIR} tensorflow/tensorflow:nigh
     --train_prefix=/nmt/train/train \
     --dev_prefix=/nmt/train/dev  \
     --test_prefix=/nmt/train/test \
-    --out_dir=/nmt/save/model-${CURR_TIME} \
+    --out_dir=/nmt/save/model \
     --num_train_steps=12000 \
     --steps_per_stats=100 \
     --num_layers=2 \
@@ -19,4 +19,3 @@ nvidia-docker run --rm -v ${SOURCE_DIR}:${VOLUME_DIR} tensorflow/tensorflow:nigh
     --share_vocab \
     --metrics=bleu | tee /nmt/logs/train-${CURR_TIME}.log"
 
-cd ${SOURCE_DIR}/save && ln -fs model-${CURR_TIME}/ model
