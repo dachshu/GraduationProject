@@ -10,7 +10,7 @@ CRAWL_DATE=$(date '+%Y%m%d' -d "yesterday")
 
 # CharRNN 학습 데이터 준비
 echo "=== Start Crawling ${CRAWL_DATE} ==="
-${CRAWLER_DIR}/DaumCrawler.py --date ${CRAWL_DATE}
+${CRAWLER_DIR}/DaumCrawler.py --date ${CRAWL_DATE} -p 4
 
 echo "=== Filtering Crawled Data ==="
 echo -e "${CRAWLED_DATA_DIR}/${CRAWL_DATE}" | ${FILTER_DIR}/make_data.sh
