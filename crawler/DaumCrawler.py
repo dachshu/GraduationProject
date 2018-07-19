@@ -5,6 +5,7 @@ import datetime
 import json
 import argparse
 import sys
+from enum import Enum
 from multiprocessing import Pool, Queue
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
@@ -13,6 +14,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(sys.argv[0]))
+
+class CompleteState(Enum):
+    COMPLETE=1
+    FAIL=2
 
 class DaumCrawler:
     def __init__(self):
@@ -66,12 +71,15 @@ class DaumCrawler:
             os.makedirs(save_path, exist_ok=True)
             f = open(save_path + '/' + news['id'], 'w', encoding='utf-8')
             f.write(json_data)
+            compelete_status=CompleteState.COMPLETE
         except Exception as e:
             with open("error.log", 'a') as err_file:
                 log_text = str(date) + ", " + str(url) + ", " + str(e) + "\n"
                 err_file.write(log_text)
+            compelete_status=CompleteState.FAIL
         finally:
             browser.quit()
+            return compelete_status
 
 
     def _parse_news(browser, url):
@@ -199,6 +207,7 @@ def get_urls_to_crawl(crawler):
     parser.add_argument('--date', nargs='+', help='date to crawl. the format is YYYYMMDD. ex)20180211')
     parser.add_argument('-u', '--url', help='make \'date\' parameter to get a url')
     parser.add_argument('--duration', nargs=2, help='crawling news between two dates')
+    parser.add_argument('-p', '--process_num', type=int, help='number of worker process')
     args = parser.parse_args()
 
     urls = []
@@ -219,14 +228,20 @@ def get_urls_to_crawl(crawler):
     for date in dates:
         urls += crawler.get_url_from_date(date)
 
-    return urls
+    return (urls, args)
+
+
+def crawl(data):
+    DaumCrawler.crawl_url_and_save(webdriver.Firefox(), data[0], data[1])
+
 
 if __name__ == '__main__':
     os.environ['MOZ_HEADLESS'] = '1'
     dc = DaumCrawler()
-    urls = get_urls_to_crawl(dc)
-    
-    print('0/%d has crawled' % len(urls))
-    for i, url in enumerate(urls):
-        DaumCrawler.crawl_url_and_save(webdriver.Firefox(), url[0], url[1])
-        print('%d/%d has crawled' % (i, len(urls)))
+    urls, args = get_urls_to_crawl(dc)
+
+    print(args.process_num)
+    pool = Pool(processes=args.process_num)
+
+    print('start crawling')
+    pool.map(crawl,urls)
