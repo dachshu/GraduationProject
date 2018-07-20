@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(cd $(dirname $0) && pwd)
-CHAR_RNN_DIR=${SCRIPT_DIR}/char-rnn-tensorflow
+CHAR_RNN_DIR=${SCRIPT_DIR}/kor-char-rnn-tensorflow
 NMT_DIR=${SCRIPT_DIR}/nmt
 TWEET_UPLOADER_DIR=${SCRIPT_DIR}/TweetUploader
 
@@ -40,12 +40,12 @@ for t in ${GENERATED_TIMES}; do
     echo "Generate a comment from the title: ${SELECTED_TITLE}"
     echo "${SELECTED_TITLE}" > ${CHAR_RNN_DIR}/input_for_generation.txt
     python3 ${CHAR_RNN_DIR}/sample.py --save_dir ${CHAR_RNN_DIR}/save/news --prime "$(head -1 ${CHAR_RNN_DIR}/input_for_generation.txt)" \
-        --output_file /tmp/char_rnn_infer_output.txt
+        --output_file /tmp/char_rnn_infer_output.txt && \
     cat /tmp/char_rnn_infer_output.txt >> /tmp/generated_comments.txt
 
     echo "${SELECTED_TITLE}" > ${NMT_DIR}/input_for_generation.txt
-    ${NMT_DIR}/infer.sh ${NMT_DIR}/save/model ${NMT_DIR}/input_for_generation.txt ${NMT_DIR}/infer_output.txt
-    cat ${NMT_DIR}/infer_output.txt >> /tmp/generated_comments.txt && rm ${NMT_DIR}/infer_output.txt
+    ${NMT_DIR}/infer.sh ${NMT_DIR}/save/model ${NMT_DIR}/input_for_generation.txt ${NMT_DIR}/infer_output.txt && \
+    cat ${NMT_DIR}/infer_output.txt >> /tmp/generated_comments.txt
 
     cat /tmp/generated_comments.txt | ${TWEET_UPLOADER_DIR}/TweetUploader.py -k ${TWEET_UPLOADER_DIR}/twitter_key
 done
