@@ -16,7 +16,7 @@ class TextLoader():
         vocab_file = os.path.join(data_dir, "vocab.pkl")
         tensor_file = os.path.join(data_dir, "data.npy")
 
-        if not (os.path.exists(vocab_file) and os.path.exists(tensor_file)):
+        if not (os.path.exists(vocab_file)):
             print("reading text file")
             self.preprocess(input_file, vocab_file, tensor_file)
         else:
@@ -38,7 +38,7 @@ class TextLoader():
         self.tensor = np.array(list(map(self.vocab.get, data)))
         np.save(tensor_file, self.tensor)
 
-    def load_preprocessed(self, iput_file, vocab_file, tensor_file):
+    def load_preprocessed(self, input_file, vocab_file, tensor_file):
         with open(vocab_file, 'rb') as f:
             self.chars = cPickle.load(f)
         self.vocab_size = len(self.chars)
