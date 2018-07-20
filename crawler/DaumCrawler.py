@@ -5,7 +5,6 @@ import datetime
 import json
 import argparse
 import sys
-from enum import Enum
 from multiprocessing import Pool, Queue
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
@@ -14,10 +13,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(sys.argv[0]))
-
-class CompleteState(Enum):
-    COMPLETE=1
-    FAIL=2
 
 class DaumCrawler:
     def __init__(self):
@@ -71,15 +66,12 @@ class DaumCrawler:
             os.makedirs(save_path, exist_ok=True)
             f = open(save_path + '/' + news['id'], 'w', encoding='utf-8')
             f.write(json_data)
-            compelete_status=CompleteState.COMPLETE
         except Exception as e:
             with open("error.log", 'a') as err_file:
                 log_text = str(date) + ", " + str(url) + ", " + str(e) + "\n"
                 err_file.write(log_text)
-            compelete_status=CompleteState.FAIL
         finally:
             browser.quit()
-            return compelete_status
 
 
     def _parse_news(browser, url):
