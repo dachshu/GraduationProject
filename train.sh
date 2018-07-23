@@ -25,8 +25,10 @@ tar -czf "${CHAR_RNN_DIR}/save/news.bak-${TODAY}.tgz" -C ${CHAR_RNN_DIR}/save ne
 
 # NMT 학습 데이터 준비
 NMT_ADDTIONAL_DATE=$(date '+%Y%m%d' -d "2 day ago")
-echo -e "${CRAWLED_DATA_DIR}/${CRAWL_DATE}\n${CRAWLED_DATA_DIR}/${NMT_ADDTIONAL_DATE}" | ${FILTER_DIR}/make_data.sh
+echo -e "${CRAWLED_DATA_DIR}/${CRAWL_DATE}\n${CRAWLED_DATA_DIR}/${NMT_ADDTIONAL_DATE}" | ${FILTER_DIR}/make_data.sh 7000
 
 echo "=== Start Learning ==="
 cd ${CHAR_RNN_DIR} && ${CHAR_RNN_DIR}/train.sh --init_from ${CHAR_RNN_DIR}/save/news
+docker run --rm -v ${NMT_DIR}:/nmt tensorflow/tensorflow:nightly-devel-py3 bash -c \
+    "rm -r /nmt/save/model/*"
 ${NMT_DIR}/train.sh
