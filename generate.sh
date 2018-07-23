@@ -48,6 +48,6 @@ for t in ${GENERATED_TIMES}; do
     cat ${NMT_DIR}/infer_output.txt >> /tmp/generated_comments.txt
 
     cat /tmp/generated_comments.txt | ${TWEET_UPLOADER_DIR}/TweetUploader.py -k ${TWEET_UPLOADER_DIR}/twitter_key
+    ( cd ${TIME_GENERATOR_DIR} && echo "${GENERATED_TIMES}" | tail -1 > latest_generated_time )
 done
 
-cd ${TIME_GENERATOR_DIR} && echo "${GENERATED_TIMES}" | tail -1 > latest_generated_time

@@ -23,12 +23,15 @@ def filter_comment(archive_file, dislike_multiplier):
 
 
 def limit_comments_num(comments, max_num):
+    total_cmt_num = 0
     result = []
     for cmt_dict in comments:
-        if len(result)+len(cmt_dict["comments"]) < max_num:
+        cmt_num = len(cmt_dict["comments"])
+        if total_cmt_num + cmt_num < max_num:
             result.append(cmt_dict)
+            total_cmt_num += cmt_num
         else:
-            cmt_dict["comments"] = cmt_dict["comments"][:max_num-len(result)]
+            cmt_dict["comments"] = cmt_dict["comments"][:max_num-total_cmt_num]
             result.append(cmt_dict)
             break
 
