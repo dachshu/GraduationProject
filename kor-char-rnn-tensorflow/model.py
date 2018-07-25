@@ -95,9 +95,11 @@ class Model():
         print('Generate sample start with:', prime)
         # make rnn state by feeding in prime sequence. 
         for char in prime[:-1]:
-            print('put this to rnn to make state:', char)
+            if char not in vocab:
+                continue
             x = np.zeros((1, 1)) # 1x1 matrix
             x[0, 0] = vocab[char]
+            print('put this to rnn to make state:', char)
             feed = {self.input_data: x, self.initial_state: state}
             [state] = sess.run([self.final_state], feed)
 
