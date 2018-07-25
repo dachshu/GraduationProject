@@ -17,6 +17,11 @@ def get_article_title(url):
     return (soup.find('h3', class_='tit_view').text, ret_url)
 
 
+def is_valid_url(url):
+    # 기상특보의 이상한 url인지 아닌지 판별
+    return 'http' in url and '기상특보' not in url
+
+
 if __name__ == '__main__':
     rq = requests.get('https://m.daum.net')
     soup = BeautifulSoup(rq.text, 'html.parser')
@@ -24,7 +29,7 @@ if __name__ == '__main__':
     articles = []
     articles += soup.select('div.out_ibox div:nth-of-type(1) ul.list_txt a')
 
-    titles = [get_article_title(article['href']) for article in articles[:5]]
+    titles = [get_article_title(article['href']) for article in articles[:5] if is_valid_url(article['href'])]
     
     for title in titles:
         print(title[0])
