@@ -3,5 +3,6 @@
 SCRIPT_DIR=$(cd $(dirname $0) && pwd)
 TODAY=$(date '+%Y-%m-%d')
 
-${SCRIPT_DIR}/train.sh
-mkdir -p ${SCRIPT_DIR}/log && ${SCRIPT_DIR}/generate.sh | tee ${SCRIPT_DIR}/log/generation-log-${TODAY}
+mkdir -p ${SCRIPT_DIR}/log/${TODAY}
+${SCRIPT_DIR}/train.sh | tee ${SCRIPT_DIR}/log/${TODAY}/train-log
+${SCRIPT_DIR}/generate.sh | tee ${SCRIPT_DIR}/log/${TODAY}/generation-log
