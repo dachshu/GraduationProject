@@ -14,9 +14,12 @@ from selenium.webdriver.support import expected_conditions as EC
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(sys.argv[0]))
 
+def get_new_browser():
+    return webdriver.Firefox(executable_path='/home/cjy/.local/bin/geckodriver')
+
 class DaumCrawler:
     def __init__(self):
-        self.browser = webdriver.Firefox()
+        self.browser = get_new_browser()
         self.browser.implicitly_wait(0)
         self.base_url = u'http://media.daum.net/ranking/bestreply/?regDate='
 
@@ -34,7 +37,7 @@ class DaumCrawler:
                 log_text = str(date) + ", " + str(url) + ", " + str(e) + "\n"
                 err_file.write(log_text)
             self.browser.quit()
-            self.browser = webdriver.Firefox()
+            self.browser = get_new_browser()
             return []
 
 
@@ -224,7 +227,7 @@ def get_urls_to_crawl(crawler):
 
 
 def crawl(data):
-    DaumCrawler.crawl_url_and_save(webdriver.Firefox(), data[0], data[1])
+    DaumCrawler.crawl_url_and_save(get_new_browser(), data[0], data[1])
 
 
 completed_num = 0
