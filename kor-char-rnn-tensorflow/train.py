@@ -89,7 +89,10 @@ def train(args):
 
     model = Model(args)
 
-    with tf.Session() as sess:
+    # not pre-allocate gpu memory
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    with tf.Session(config = config) as sess:
         # instrument for tensorboard
         summaries = tf.summary.merge_all()
         writer = tf.summary.FileWriter(
@@ -101,6 +104,10 @@ def train(args):
         # restore model
         if args.init_from is not None:
             saver.restore(sess, ckpt.model_checkpoint_path)
+
+        # make graph as read-only
+        sess.graph.finalize()
+
         for e in tqdm(range(args.num_epochs)):
             # sess.run(tf.assign(model.lr, args.learning_rate * (args.decay_rate ** e))) # No explicit learning rate is required for Adam optimizer.
             data_loader.reset_batch_pointer()
