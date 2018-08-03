@@ -4,6 +4,7 @@ SCRIPT_DIR=$(cd $(dirname $0) && pwd)
 CHAR_RNN_DIR=${SCRIPT_DIR}/kor-char-rnn-tensorflow
 NMT_DIR=${SCRIPT_DIR}/nmt
 TWEET_UPLOADER_DIR=${SCRIPT_DIR}/TweetUploader
+PARTIAL_PRINTER_DIR${SCRIPT_DIR}/partial_print
 
 echo "=== Generating Times ==="
 TIME_GENERATOR_DIR=${SCRIPT_DIR}/CommentTimeGenerator
@@ -47,7 +48,7 @@ for t in ${GENERATED_TIMES}; do
     ${NMT_DIR}/infer.sh ${NMT_DIR}/save/model ${NMT_DIR}/input_for_generation.txt ${NMT_DIR}/infer_output.txt && \
     cat ${NMT_DIR}/infer_output.txt >> /tmp/generated_comments.txt
 
-    cat /tmp/generated_comments.txt | ${TWEET_UPLOADER_DIR}/TweetUploader.py -k ${TWEET_UPLOADER_DIR}/twitter_key
+    cat /tmp/generated_comments.txt | ${PARTIAL_PRINTER_DIR}/partial_print.py -140 | ${TWEET_UPLOADER_DIR}/TweetUploader.py -k ${TWEET_UPLOADER_DIR}/twitter_key
     ( cd ${TIME_GENERATOR_DIR} && echo "${GENERATED_TIMES}" | tail -1 > latest_generated_time )
 done
 
