@@ -28,8 +28,9 @@ if __name__ == '__main__':
   
     articles = []
     articles += soup.select('div.out_ibox div:nth-of-type(1) ul.list_txt a')
+    num_articles = 5 if len(articles) >= 5 else len(articles)
 
-    titles = [get_article_title(article['href']) for article in articles[:5] if is_valid_url(article['href'])]
+    titles = [get_article_title(article['href']) for article in articles[:num_articles] if is_valid_url(article['href'])]
     
     for title in titles:
         print(title[0])
