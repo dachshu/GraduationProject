@@ -4,7 +4,7 @@ SCRIPT_DIR=$(cd $(dirname $0) && pwd)
 CHAR_RNN_DIR=${SCRIPT_DIR}/kor-char-rnn-tensorflow
 NMT_DIR=${SCRIPT_DIR}/nmt
 TWEET_UPLOADER_DIR=${SCRIPT_DIR}/TweetUploader
-PARTIAL_PRINTER_DIR${SCRIPT_DIR}/partial_print
+PARTIAL_PRINTER_DIR=${SCRIPT_DIR}/partial_print
 
 echo "=== Generating Times ==="
 TIME_GENERATOR_DIR=${SCRIPT_DIR}/CommentTimeGenerator
