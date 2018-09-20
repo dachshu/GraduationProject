@@ -20,6 +20,10 @@ echo "=== Start Learning ==="
 mkdir -p ${CHAR_RNN_DIR}/data/news
 cp ${FILTER_DIR}/output/char_rnn_data.txt ${CHAR_RNN_DIR}/data/news/input.txt
 
+# 백업이 4개 이상이면 기존 것 제거
+if [ $(ls ${CHAR_RNN_DIR}/save/news.bak* | wc -l) -gt 4 ]; then
+    rm $(ls ${CHAR_RNN_DIR}/save/news.bak* | head -1)
+fi
 # CharRNN 기존 모델 백업
 tar -czf "${CHAR_RNN_DIR}/save/news.bak-${TODAY}.tgz" -C ${CHAR_RNN_DIR}/save news/
 
