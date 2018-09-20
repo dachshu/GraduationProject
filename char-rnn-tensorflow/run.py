@@ -28,9 +28,9 @@ checkpoint_path = os.path.join(output_dir, 'model.ckpt')
 batch_size = 50 # Training : 50, Sampling : 1
 seq_length = 50 # Training : 50, Sampling : 1
 hidden_size = 128   # 히든 레이어의 노드 개수
-learning_rate = 0.002
-num_epochs = 2
-num_hidden_layers = 2
+learning_rate = 0.001
+num_epochs = 100
+num_hidden_layers = 5
 grad_clip = 5   # Gradient Clipping에 사용할 임계값
 
 # TextLoader를 이용해서 데이터를 불러옵니다.
