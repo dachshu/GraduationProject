@@ -37,7 +37,8 @@ def process_data(file_name):
             vocab.update(cmt.split())
             comments.append(cmt)
             word_train_text.write(cmt)
-            char_rnn_train_data.write(title.replace('\n', '') + ' ' +  cmt)
+            title = title.replace('\t', ' ')
+            char_rnn_train_data.write(title.replace('\n', '') + '\t' +  cmt)
 
             #vocab.add(str(i))
             #t = str(i) + ' ' + title
