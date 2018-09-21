@@ -94,6 +94,7 @@ class Model():
         state = sess.run(self.cell.zero_state(1, tf.float32))
         print('Generate sample start with:', prime)
         # make rnn state by feeding in prime sequence. 
+        prime = prime + '\t'
         for char in prime[:-1]:
             if char not in vocab:
                 continue
