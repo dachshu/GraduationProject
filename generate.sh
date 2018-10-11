@@ -22,7 +22,7 @@ for t in ${GENERATED_TIMES}; do
         continue
     fi
 
-    $(at ${HOUR}:${MINITE} -f ${SCRIPT_DIR}/generate_comment.sh)
+    $(echo "${SCRIPT_DIR}/generate_comment.sh 2>&1 | tee ${SCRIPT_DIR}/log/${TODAY}/generation-log" | at ${HOUR}:${MINUTE})
 done
 
 ( cd ${TIME_GENERATOR_DIR} && echo "${GENERATED_TIMES}" | tail -1 > latest_generated_time )
