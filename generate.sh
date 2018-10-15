@@ -2,13 +2,24 @@
 
 SCRIPT_DIR=$(cd $(dirname $0) && pwd)
 
-echo "=== Generating Times ==="
+LOG_DIR=${SCRIPT_DIR}/log/${TODAY}
+# General log file path.
+G_LOG_PATH=${LOG_DIR}/general.log
+touch ${G_LOG_PATH}
+
+DETAIL_LOGS_DIR=${LOG_DIR}/detail
+mkdir -p ${DETAIL_LOGS_DIR}
+TIME_LOG_PATH=${DETAIL_LOGS_DIR}/upload_time.log
+
+echo "[INFO] Start generating upload time" >> ${G_LOG_PATH}
 TIME_GENERATOR_DIR=${SCRIPT_DIR}/CommentTimeGenerator
 cd ${TIME_GENERATOR_DIR}
 LATEST_TIME=$(cat latest_generated_time)
 GENERATED_TIMES=$(./TimeModel.py sample ${LATEST_TIME})
+echo "${GENERATED_TIMES}" > ${TIME_LOG_PATH}
+echo "[INFO] Finished generating upload time" >> ${G_LOG_PATH}
 
-echo "=== Generating Comments ==="
+echo "[INFO] Start generating comments" >> ${G_LOG_PATH}
 TODAY=$(date '+%Y-%m-%d')
 for t in ${GENERATED_TIMES}; do
     HOUR=$(echo "${t}/3600" | bc)
