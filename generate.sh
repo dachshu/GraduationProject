@@ -2,6 +2,7 @@
 
 SCRIPT_DIR=$(cd $(dirname $0) && pwd)
 
+TODAY=$(date '+%Y-%m-%d')
 LOG_DIR=${SCRIPT_DIR}/log/${TODAY}
 # General log file path.
 G_LOG_PATH=${LOG_DIR}/general.log
