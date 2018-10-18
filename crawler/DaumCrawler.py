@@ -39,7 +39,7 @@ class DaumCrawler:
             self.browser = get_new_browser()
             return []
 
-
+    @staticmethod
     def crawl_url(browser, url):
         try:
             browser.get(url)
@@ -56,7 +56,7 @@ class DaumCrawler:
 
             DaumCrawler._scroll_to_end(browser)
             cmt_list = browser.find_elements_by_xpath("//ul[contains(@class, 'list_comment')]//li")
-            for i, cmt in enumerate(cmt_list):
+            for _, cmt in enumerate(cmt_list):
                 data = DaumCrawler._parse_comment(cmt)
                 if data:
                     news['comment'][data['id']] = data
@@ -70,6 +70,7 @@ class DaumCrawler:
             browser.quit()
 
 
+    @staticmethod
     def _parse_news(browser, url):
         news_id = url.split('/')[-1]
         news_title = browser.find_element_by_xpath("//h3[contains(@class, 'tit_view')]").text
@@ -86,6 +87,7 @@ class DaumCrawler:
         news = {'type' : 'news', 'id' : news_id, 'title' : news_title, 'time' : news_open_time, 'modi_time' : news_modi_time, 'press' : news_press, 'reporter' : news_reporter, 'text' : news_body }
         return news
 
+    @staticmethod
     def _scroll_to_end(browser):
         try:
             more_box = browser.find_element_by_css_selector("div.cmt_box>div.alex_more a")
@@ -105,6 +107,7 @@ class DaumCrawler:
         except (NoSuchElementException, StaleElementReferenceException):
             return
 
+    @staticmethod
     def _open_reply(comment):
         try:
             reply_btn = comment.find_element_by_css_selector("div.box_reply button.reply_count span.num_txt")
@@ -143,6 +146,7 @@ class DaumCrawler:
             urls.append(tag_a.get_attribute("href"))
         return urls
 
+    @staticmethod
     def _parse_comment(comment, is_reply=False):
         data = {}
 
@@ -198,7 +202,7 @@ def get_arguments():
     args = parser.parse_args()
 
     if not os.path.isdir(args.out_dir):
-        argparse.ArgumentParser.error("out_dir should be a directory.")
+        parser.error("out_dir should be a directory.")
 
     return args
 
