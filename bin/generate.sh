@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_DIR=$(cd $(dirname $0) && pwd)
+SCRIPT_DIR=$(cd $(dirname $0)/.. && pwd)
 
 TODAY=$(date '+%Y-%m-%d')
 LOG_DIR=${SCRIPT_DIR}/log/${TODAY}

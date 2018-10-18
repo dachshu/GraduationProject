@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_DIR=$(cd $(dirname $0) && pwd)
+SCRIPT_DIR=$(cd $(dirname $0)/.. && pwd)
 CHAR_RNN_DIR=${SCRIPT_DIR}/kor-char-rnn-tensorflow
 NMT_DIR=${SCRIPT_DIR}/nmt
 TWEET_UPLOADER_DIR=${SCRIPT_DIR}/TweetUploader
