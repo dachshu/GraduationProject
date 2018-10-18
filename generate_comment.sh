@@ -5,6 +5,7 @@ CHAR_RNN_DIR=${SCRIPT_DIR}/kor-char-rnn-tensorflow
 NMT_DIR=${SCRIPT_DIR}/nmt
 TWEET_UPLOADER_DIR=${SCRIPT_DIR}/TweetUploader
 PARTIAL_PRINTER_DIR=${SCRIPT_DIR}/partial_print
+TODAY=$(date '+%Y-%m-%d')
 
 LOG_DIR=${SCRIPT_DIR}/log/${TODAY}
 # General log file path.
