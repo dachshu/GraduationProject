@@ -62,7 +62,7 @@ class DaumCrawler:
                     news['comment'][data['id']] = data
 
             #write
-            return json.dumps(news, ensure_ascii=False)
+            return news
         except Exception as e:
             err_text = "ERROR: in " + str(url) + ", " + str(e)
             print(err_text, file=sys.stderr)
@@ -210,7 +210,7 @@ def get_urls_to_be_crawled(args, crawler):
     urls = []
     for date in args.date:
         urls += crawler.get_url_from_date(date)
-    print("Following news articles are going to be crawled: " + ", ".join(urls))
+    print("Following news articles are going to be crawled:\n" + "\n".join(urls))
 
     return urls
 
@@ -225,7 +225,7 @@ def save_result(result, total_num, save_path):
     completed_num += 1
     url, news_data = result
     with open(os.path.join(save_path, news_data["id"]), 'w', encoding='utf-8') as f:
-        f.write(news_data)
+        json.dump(news_data, f, ensure_ascii=False)
     print("Crawled %s, %d/%d has done" % (url, completed_num, total_num))
 
 if __name__ == '__main__':
