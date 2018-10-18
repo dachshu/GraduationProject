@@ -19,3 +19,5 @@ crawler/time_archive/
 TweetUploader/twitter_key
 CommentTimeGenerator/latest_generated_time
 **/*.pyc
+log/*
+geckodriver.log
