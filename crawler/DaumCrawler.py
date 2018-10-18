@@ -15,7 +15,7 @@ from selenium.webdriver.support import expected_conditions as EC
 SCRIPT_PATH = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 def get_new_browser():
-    return webdriver.Firefox(executable_path='/home/cjy/.local/bin/geckodriver')
+    return webdriver.Firefox()
 
 class DaumCrawler:
     def __init__(self):
@@ -31,17 +31,16 @@ class DaumCrawler:
     def get_url_from_date(self, date):
         try:
             urls = self.get_targets(date)
-            return [(str(date), url) for url in urls]
+            return urls
         except Exception as e:
-            with open("error.log", 'a') as err_file:
-                log_text = str(date) + ", " + str(url) + ", " + str(e) + "\n"
-                err_file.write(log_text)
+            err_text =  "ERROR: While getting URLs from " + str(date) + ", " + str(e)
+            print(err_text, file=sys.stderr)
             self.browser.quit()
             self.browser = get_new_browser()
             return []
 
 
-    def crawl_url_and_save(browser, date, url):
+    def crawl_url(browser, url):
         try:
             browser.get(url)
 
@@ -57,22 +56,16 @@ class DaumCrawler:
 
             DaumCrawler._scroll_to_end(browser)
             cmt_list = browser.find_elements_by_xpath("//ul[contains(@class, 'list_comment')]//li")
-            cmt_num = len(cmt_list)
             for i, cmt in enumerate(cmt_list):
                 data = DaumCrawler._parse_comment(cmt)
                 if data:
                     news['comment'][data['id']] = data
 
             #write
-            json_data = json.dumps(news, ensure_ascii=False)
-            save_path = SCRIPT_PATH + '/crawled_data/daum_news/' + str(date)
-            os.makedirs(save_path, exist_ok=True)
-            f = open(save_path + '/' + news['id'], 'w', encoding='utf-8')
-            f.write(json_data)
+            return json.dumps(news, ensure_ascii=False)
         except Exception as e:
-            with open("error.log", 'a') as err_file:
-                log_text = str(date) + ", " + str(url) + ", " + str(e) + "\n"
-                err_file.write(log_text)
+            err_text = "ERROR: in " + str(url) + ", " + str(e)
+            print(err_text, file=sys.stderr)
         finally:
             browser.quit()
 
@@ -199,43 +192,35 @@ class DaumCrawler:
 
 def get_urls_to_crawl(crawler):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--date', nargs='+', help='date to crawl. the format is YYYYMMDD. ex)20180211')
-    parser.add_argument('-u', '--url', help='make \'date\' parameter to get a url')
-    parser.add_argument('--duration', nargs=2, help='crawling news between two dates')
+    parser.add_argument('date', nargs='+', help='date to crawl. the format is YYYYMMDD. ex)20180211')
+    parser.add_argument('out_dir', type=str, help='The directory where crawled news articles are going to be saved.')
     parser.add_argument('-p', '--process_num', type=int, help='number of worker process')
     args = parser.parse_args()
 
+    if not os.path.isdir(args.out_dir):
+        argparse.ArgumentParser.error("out_dir should be a directory.")
+
     urls = []
-    if args.url:
-        urls.append(('',args.url))
-
-    dates = []
-    if args.duration:
-        d_first = datetime.datetime.strptime(args.duration[0], "%Y%m%d").date()
-        d_last = datetime.datetime.strptime(args.duration[1], "%Y%m%d").date()
-        while d_first <= d_last:
-            dates.append(d_first.strftime("%Y%m%d"))
-            d_first += datetime.timedelta(days=1)
-    if args.date:
-        dates += args.date
-
-    print(dates)
-    for date in dates:
+    for date in args.date:
         urls += crawler.get_url_from_date(date)
+    print("Following news articles are going to be crawled: " + ", ".join(urls))
 
     return (urls, args)
 
 
-def crawl(data):
-    DaumCrawler.crawl_url_and_save(get_new_browser(), data[0], data[1])
-
+def crawl(url):
+    news_data = DaumCrawler.crawl_url(get_new_browser(), url)
+    return (url, news_data)
 
 completed_num = 0
 
-def print_result(result, total_num):
+def save_result(result, total_num, save_path):
     global completed_num
     completed_num += 1
-    print("%d/%d has done" % (completed_num, total_num))
+    url, news_data = result
+    with open(os.path.join(save_path, news_data["id"]), 'w', encoding='utf-8') as f:
+        f.write(news_data)
+    print("Crawled %s, %d/%d has done" % (url, completed_num, total_num))
 
 if __name__ == '__main__':
     os.environ['MOZ_HEADLESS'] = '1'
@@ -245,6 +230,6 @@ if __name__ == '__main__':
     pool = Pool(processes=args.process_num)
 
     print('start crawling')
-    results = [pool.apply_async(crawl, (data,), callback=lambda r: print_result(r, len(urls))) for data in urls]
+    results = [pool.apply_async(crawl, (url,), callback=lambda x: save_result(x, len(urls), args.out_dir)) for url in urls]
     for result in results:
         result.wait()
