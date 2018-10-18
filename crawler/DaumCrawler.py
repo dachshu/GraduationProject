@@ -190,7 +190,7 @@ class DaumCrawler:
 
         return data
 
-def get_urls_to_crawl(crawler):
+def get_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('date', nargs='+', help='date to crawl. the format is YYYYMMDD. ex)20180211')
     parser.add_argument('out_dir', type=str, help='The directory where crawled news articles are going to be saved.')
@@ -200,13 +200,15 @@ def get_urls_to_crawl(crawler):
     if not os.path.isdir(args.out_dir):
         argparse.ArgumentParser.error("out_dir should be a directory.")
 
+    return args
+
+def get_urls_to_be_crawled(args, crawler):
     urls = []
     for date in args.date:
         urls += crawler.get_url_from_date(date)
     print("Following news articles are going to be crawled: " + ", ".join(urls))
 
-    return (urls, args)
-
+    return urls
 
 def crawl(url):
     news_data = DaumCrawler.crawl_url(get_new_browser(), url)
@@ -224,8 +226,10 @@ def save_result(result, total_num, save_path):
 
 if __name__ == '__main__':
     os.environ['MOZ_HEADLESS'] = '1'
-    dc = DaumCrawler()
-    urls, args = get_urls_to_crawl(dc)
+    args = get_arguments()
+    
+    crawler = DaumCrawler()
+    urls = get_urls_to_be_crawled(args, crawler)
 
     pool = Pool(processes=args.process_num)
 
