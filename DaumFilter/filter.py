@@ -41,13 +41,7 @@ def limit_comments_num(comments, max_num):
 # 전체 기록에서 댓글만 반환하는 함수
 def get_comment_list(archive_dict):
     return archive_dict["comment"].values()
-
-# 댓글이 기준에 만족하는지 확인하는 함수를 반환하는 함수
-def is_useful(min_like, min_like_ratio, dislike_multiplier):
-    def is_useful_comment(comment):
-        return comment["like"] >= min_like and (comment["dislike"] == 0 or (comment["like"]/(comment["dislike"]*dislike_multiplier)) >= min_like_ratio)
-
-    return is_useful_comment
+    
 
 if __name__ == "__main__":
     parser = add_arguments(argparse.ArgumentParser())
@@ -72,9 +66,8 @@ if __name__ == "__main__":
     result = [filter_comment(open(archive), args.dislike_multiplier) for archive in archives]
     if args.max_cmt > 0:
         result = limit_comments_num(result, args.max_cmt)
-    result_json = json.dumps(result, ensure_ascii=False)
     if args.out_to == None:
-        print(result_json)
+        print(json.dumps(result, ensure_ascii=False))
     else:
-        args.out_to.write(result_json)
+        json.dump(result, args.out_to, ensure_ascii=False)
 
