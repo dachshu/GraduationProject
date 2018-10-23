@@ -2,7 +2,7 @@
 
 echoerr() { echo "$@" 1>&2; exit; }
 
-SCRIPT_DIR=$(cd $(dirname $0) && pwd)
+SCRIPT_DIR=$(cd $(dirname $0)/.. && pwd)
 CRAWLER_DIR=${SCRIPT_DIR}/crawler
 CRAWLED_DATA_DIR=${CRAWLER_DIR}/crawled_data/daum_news
 FILTER_DIR=${SCRIPT_DIR}/DaumFilter
