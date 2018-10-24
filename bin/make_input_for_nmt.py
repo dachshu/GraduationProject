@@ -12,7 +12,7 @@ white_to_space = re.compile(r"\s+")
 
 def add_arguments(parser):
     parser.add_argument("title_comment_file", type=argparse.FileType(mode='r', encoding='utf-8'), help="a JSON formatted file which has titles and comments of news articles")
-    parser.add_argument("out_dir", type=argparse.FileType(mode='w', encoding='utf-8'), help="a directory where title, comment, vocab files will be saved")
+    parser.add_argument("out_dir", type=str, help="a directory where title, comment, vocab files will be saved")
     parser.add_argument("-n", "--max_num", type=int, default=7000, help="a maximum number of comments that the output files can have")
     return parser
 
@@ -25,13 +25,15 @@ def write_output_files(json_input, out_dir, max_comment_num):
     #       title 파일에 제목을 작성하고 comment 파일에 댓글 작성
     #       댓글을 공백으로 분리해서 set에 추가
     open_out_file = lambda p: open(path.join(out_dir, p), 'w', encoding='utf-8')
-
     vocab = set()
+    total_comment_num = 0
+
     for dic in json_input:
         title = white_to_space.sub(" ", dic["title"])
         vocab.update(title.split(" "))
-        comment_it = itertools.islice(map(lambda cmt: white_to_space.sub(" ", cmt), dic["comments"]), max_comment_num)
+        comment_it = itertools.islice(map(lambda cmt: white_to_space.sub(" ", cmt), dic["comments"]), max_comment_num - total_comment_num)
         comments = list(comment_it)
+        total_comment_num += len(comments)
         train_set_num = int(len(comments)*0.7)
 
         with open_out_file("train.title") as train_title, open_out_file("train.comment") as train_comment:
@@ -42,9 +44,18 @@ def write_output_files(json_input, out_dir, max_comment_num):
             test_title.write('\n'.join(itertools.repeat(title, len(comments)-train_set_num)))
             test_comment.write('\n'.join(comments[train_set_num:]))
 
+        for comment in comments:
+            vocab.update(comment.split(" "))
+
+    with open_out_file("vocab.title") as vocab_title:
+        vocab_title.write('<s>\n</s>\n')
+        vocab_title.write('\n'.join(vocab))
+
 
 if __name__ == "__main__":
     parser = add_arguments(argparse.ArgumentParser())
     args = parser.parse_args()
+    if not path.isdir(args.out_dir):
+        parser.error("The directory doesn't exist")
     json_input = json.load(args.title_comment_file)
-    write_output_files(json_input, args.out_file, args.max_num)
+    write_output_files(json_input, args.out_dir, args.max_num)
