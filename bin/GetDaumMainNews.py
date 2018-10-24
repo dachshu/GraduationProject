@@ -9,7 +9,7 @@ def get_article_title(url):
     rq = requests.get(url)
     soup = BeautifulSoup(rq.text, 'html.parser')
     if 'm.media' in url:
-        article = soup.select('div.item_mainnews a.link_cont')
+        article = soup.select('div.cont_thumb a.link_cont')
         ret_url = article[0]['href']
         rq = requests.get(ret_url)
         soup = BeautifulSoup(rq.text, 'html.parser')
