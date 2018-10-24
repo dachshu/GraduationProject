@@ -9,6 +9,9 @@ fi
 
 mkdir -p "${OUTPUT_DIR}"
 
+INPUT_DIR=$(cd ${INPUT_DIR} && pwd)
+OUTPUT_DIR=$(cd ${OUTPUT_DIR} && pwd)
+
 PROJECT_DIR=$(cd $(dirname "$0")/.. && pwd)
 NMT_DIR=${PROJECT_DIR}/nmt
 INNER_NMT_DIR=/nmt
