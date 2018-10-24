@@ -4,7 +4,9 @@ import json
 import argparse
 import itertools
 import re
+import shutil
 from os import path
+import os
 
 TITLE_SUFFIX="title"
 COMMENT_SUFFIX="comment"
@@ -24,7 +26,8 @@ def write_output_files(json_input, out_dir, max_comment_num):
     #       댓글의 모든 whitespace들을 공백문자로 변경
     #       title 파일에 제목을 작성하고 comment 파일에 댓글 작성
     #       댓글을 공백으로 분리해서 set에 추가
-    open_out_file = lambda p: open(path.join(out_dir, p), 'w', encoding='utf-8')
+    join_out_path = lambda f: path.join(out_dir, f)
+    open_out_file = lambda p: open(join_out_path(p), 'w', encoding='utf-8')
     vocab = set()
     total_comment_num = 0
 
@@ -51,11 +54,14 @@ def write_output_files(json_input, out_dir, max_comment_num):
         vocab_title.write('<s>\n</s>\n')
         vocab_title.write('\n'.join(vocab))
 
+    shutil.copyfile(join_out_path("test.title"), join_out_path("dev.title"))
+    shutil.copyfile(join_out_path("test.comment"), join_out_path("dev.comment"))
+
 
 if __name__ == "__main__":
     parser = add_arguments(argparse.ArgumentParser())
     args = parser.parse_args()
     if not path.isdir(args.out_dir):
-        parser.error("The directory doesn't exist")
+        os.mkdir(args.out_dir)
     json_input = json.load(args.title_comment_file)
     write_output_files(json_input, args.out_dir, args.max_num)
