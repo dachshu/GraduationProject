@@ -19,7 +19,7 @@ def filter_comment(archive_file, dislike_multiplier):
     result = sorted(comment_list, key=lambda o: o["like"] - o["dislike"]*dislike_multiplier, reverse=True)
     result = sorted(result, key=lambda o: o["like"], reverse=True)
     result_len = len(result)*0.1
-    return {"title":title, "comments":[cmt["text"] for cmt in result[:int(result_len)]]}
+    return {"title":title.replace("\t", " "), "comments":[cmt["text"].replace("\t", " ") for cmt in result[:int(result_len)]]}
 
 
 def limit_comments_num(comments, max_num):
@@ -42,12 +42,6 @@ def limit_comments_num(comments, max_num):
 def get_comment_list(archive_dict):
     return archive_dict["comment"].values()
 
-# 댓글이 기준에 만족하는지 확인하는 함수를 반환하는 함수
-def is_useful(min_like, min_like_ratio, dislike_multiplier):
-    def is_useful_comment(comment):
-        return comment["like"] >= min_like and (comment["dislike"] == 0 or (comment["like"]/(comment["dislike"]*dislike_multiplier)) >= min_like_ratio)
-
-    return is_useful_comment
 
 if __name__ == "__main__":
     parser = add_arguments(argparse.ArgumentParser())
@@ -67,14 +61,13 @@ if __name__ == "__main__":
             else:
                 archives.append(inp)
     else:
-        parser.error("The input archives are not directories or files")
+        parser.error("The input archives are neither directories nor files")
 
     result = [filter_comment(open(archive), args.dislike_multiplier) for archive in archives]
     if args.max_cmt > 0:
         result = limit_comments_num(result, args.max_cmt)
-    result_json = json.dumps(result, ensure_ascii=False)
     if args.out_to == None:
-        print(result_json)
+        print(json.dumps(result, ensure_ascii=False))
     else:
-        args.out_to.write(result_json)
+        json.dump(result, args.out_to, ensure_ascii=False)
 
