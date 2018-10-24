@@ -51,7 +51,7 @@ def write_output_files(json_input, out_dir, max_comment_num):
             vocab.update(comment.split(" "))
 
     with open_out_file("vocab.title") as vocab_title:
-        vocab_title.write('<s>\n</s>\n')
+        vocab_title.write('<unk>\n<s>\n</s>\n')
         vocab_title.write('\n'.join(vocab))
 
     shutil.copyfile(join_out_path("test.title"), join_out_path("dev.title"))
