@@ -19,7 +19,8 @@ INNER_OUTPUT_DIR=/nmt_output
 INNER_INPUT_DIR=/nmt_input
 
 nvidia-docker run --rm -v "${NMT_DIR}:${INNER_NMT_DIR}" -v "${OUT_DIR}:${INNER_OUTPUT_DIR}" -v "${INPUT_DIR}:${INNER_INPUT_DIR}" \
-    --user ${UID} tensorflow/tensorflow:nightly-devel-gpu-py3 bash -c "export PYTHONIOENCODING=UTF-8 && cd /nmt && python3 -m nmt.nmt \
+    tensorflow/tensorflow:nightly-devel-gpu-py3 \
+    bash -c "export PYTHONIOENCODING=UTF-8 && cd /nmt && python3 -m nmt.nmt \
     --src=title --tgt=comment \
     --vocab_prefix=${INNER_INPUT_DIR}/vocab \
     --train_prefix=${INNER_INPUT_DIR}/train \
