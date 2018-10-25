@@ -8,7 +8,6 @@ def add_arguments(arg_parser):
     arg_parser.add_argument("archive", nargs="*", help="archives to be filtered")
     arg_parser.add_argument("--dislike_multiplier", type=float, default=2, help="a number to be multiply to dislike count")
     arg_parser.add_argument("-o", "--out_to", type=argparse.FileType('w', encoding='utf-8'), help="a file to include this program's output") 
-    arg_parser.add_argument("-m", "--max_cmt", type=int, default=0, help="maximum number of comment to be filtered")
     return arg_parser
 
 # 걸러진 댓글들을 반환하는 함수
@@ -21,22 +20,6 @@ def filter_comment(archive_file, dislike_multiplier):
     result_len = len(result)*0.1
     return {"title":title.replace("\t", " "), "comments":[cmt["text"].replace("\t", " ") for cmt in result[:int(result_len)]]}
 
-
-def limit_comments_num(comments, max_num):
-    total_cmt_num = 0
-    result = []
-    for cmt_dict in comments:
-        cmt_num = len(cmt_dict["comments"])
-        if total_cmt_num + cmt_num < max_num:
-            result.append(cmt_dict)
-            total_cmt_num += cmt_num
-        else:
-            cmt_dict["comments"] = cmt_dict["comments"][:max_num-total_cmt_num]
-            result.append(cmt_dict)
-            break
-
-    return result
-    
 
 # 전체 기록에서 댓글만 반환하는 함수
 def get_comment_list(archive_dict):
@@ -64,8 +47,6 @@ if __name__ == "__main__":
         parser.error("The input archives are neither directories nor files")
 
     result = [filter_comment(open(archive), args.dislike_multiplier) for archive in archives]
-    if args.max_cmt > 0:
-        result = limit_comments_num(result, args.max_cmt)
     if args.out_to == None:
         print(json.dumps(result, ensure_ascii=False))
     else:
