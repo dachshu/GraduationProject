@@ -15,12 +15,11 @@ from selenium.webdriver.support import expected_conditions as EC
 SCRIPT_PATH = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 def get_new_browser():
-    return webdriver.Firefox()
+    return webdriver.Firefox("/home/cjy/.local/bin")
 
 class DaumCrawler:
     def __init__(self):
         self.browser = get_new_browser()
-        self.browser.implicitly_wait(0)
         self.base_url = u'http://media.daum.net/ranking/bestreply/?regDate='
 
 
