@@ -11,7 +11,7 @@ NMT_MODEL_DIR=${NMT_DIR}/save/model
 CRAWL_DATE=$(date '+%Y%m%d' -d "yesterday")
 TODAY=$(date '+%Y-%m-%d')
 RESULT_DIR="${PROJECT_DIR}/results/${TODAY}"
-LOG_DIR="${PROJECT_DIR}/logs/${TODAY}"
+LOG_DIR="${PROJECT_DIR}/log/${TODAY}"
 
 GENERAL_LOG_PATH="${LOG_DIR}/general.log"
 
