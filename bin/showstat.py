@@ -6,9 +6,9 @@ import re
 
 def parse_arguments(parser):
     parser.add_argument("log_dir", help="Specifies a directory where log files are.")
-    parser.add_argument("-a", "--all", type=bool, help="Shows entire status, not current status.")
+    parser.add_argument("-a", "--all", action="store_true", help="Shows entire status, not current status.")
     args = parser.parse_args()
-    if not path.is_dir(args.log_dir):
+    if not path.isdir(args.log_dir):
         parser.error("LOG_DIR is not a directory")
     return args
 
@@ -39,6 +39,7 @@ def show_status(log_dir, show_all):
             print(log_data[-1])
 
         if LAST_PATTERN.fullmatch(log_data[-1].strip()):
+            print("--- Generated comments ---")
             for root, _, files in os.walk(path.join(log_dir, "detail", "upload_comment_tweet")):
                 for f_name in files:
                     with open(path.join(root,f_name), 'r') as at_log:
