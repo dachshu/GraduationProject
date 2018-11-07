@@ -38,6 +38,8 @@ def show_status(log_dir, show_all):
         else:
             print(log_data[-1])
 
+        # TODO: show schedule
+
         if LAST_PATTERN.fullmatch(log_data[-1].strip()):
             print("--- Generated comments ---")
             for root, _, files in os.walk(path.join(log_dir, "detail", "upload_comment_tweet")):
