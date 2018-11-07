@@ -78,3 +78,5 @@ for t in ${GENERATED_TIMES}; do
 done
 
 [ ! -z "${GENERATED_TIMES}" ] && (echo "${GENERATED_TIMES}" | tail -1 > "${TIME_GENERATOR_DIR}"/latest_generated_time)
+
+echo "[INFO] Finished training steps" >> ${GENERAL_LOG_PATH}
