@@ -41,14 +41,14 @@ def show_status(log_dir, show_all):
         else:
             print(log_data[-1])
 
-        # show schedule
-        output = sp.run([path.join(SCRIPT_DIR, "get_tweet_schedule.sh")], stdout=sp.PIPE, encoding="utf-8")
-        if len(output.stdout) > 0:
-            print("--- Scheduled generation jobs ---")
-            print(output.stdout)
-
-        # show generated comments information
         if LAST_PATTERN.fullmatch(log_data[-1].strip()):
+            # show schedule
+            output = sp.run([path.join(SCRIPT_DIR, "get_tweet_schedule.sh")], stdout=sp.PIPE, encoding="utf-8")
+            if len(output.stdout) > 0:
+                print("--- Scheduled generation jobs ---")
+                print(output.stdout)
+
+            # show generated comments information
             print("--- Generated comments ---")
             for root, _, files in os.walk(path.join(log_dir, "detail", "upload_comment_tweet")):
                 for f_name in files:
