@@ -6,10 +6,10 @@
 # 사용법
 
 ```
-python3 showstat.py [-a] LOG_DIR
+python3 showstat.py [-a] [LOG_DIR]
 or
-./showstat.py [-a] LOG_DIR
+./showstat.py [-a] [LOG_DIR]
 ```
 
-- LOG_DIR: general.log 와 detail log들이 있는 디렉토리를 지정한다. 없는 디렉토리인 경우 에러를 출력한다.
+- LOG_DIR: general.log 와 detail log들이 있는 디렉토리를 지정한다. 없는 디렉토리인 경우 에러를 출력한다. 지정되지 않은 경우 "$ProjectRoot/log/$TODAY"로 지정된다.
 - -a, --all: 이 옵션이 지정되면 하루동안 일어났던 작업들을 모두 표시하고, 생성된 댓글을 표시할 때 원본 기사의 URL까지 표시한다. 지정되지 않은 경우 가장 최근의 상태만 보여준다.
