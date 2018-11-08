@@ -9,10 +9,9 @@
 
 # generate charRNN/nmt comment script
 입력받은 기사 제목 텍스트를 charRNN/nmt 모델에 입력으로 넣어 댓글 텍스트를 생성한다.
-이때 생성한 댓글 텍스트는 '~/GraduationProject/results/TODAY/(title text에 대한 md5sum)_charRNN'
+이때 생성한 댓글 텍스트는 '~/GraduationProject/results/TODAY/(title text의 첫글자_실행시각)_charRNN[nmt]'
 디렉토리 안의 'output.txt'에 저장된다.
-스크립트가 동시에 실행되도 기사제목만 다르면 input, output 파일이 충돌하지
-않도록 하기 위해 디렉토리 경로에 md5sum 해시 값을 사용했다.
+(nmt 모델의 경우 도커에서 한국어 글자 인식 문제로 인해'실행시각_nmt'에 저장된다)
 
 - input : 기사제목 텍스트 ( parameter로 입력)
 - output : 생성한 댓글이 있는 디렉토리 경로
@@ -39,6 +38,19 @@
 댓글 생성 및 트윗 업로드 at job에 이용된다.
 
 - input : None
-- output : 생성한 댓글들이 있는 디렉토리 경로
+- output : 생성한 트윗 텍스트가 있는 디렉토리 경로
 
 > ~:~/GraduationProject/bin$ ./generate_comment_tweet.sh
+
+# generate comment tweet with log
+위의 'generate_comment_tweet.sh'스크립트의 실행 결과를 표준 출력이 아닌 로그 파일에 저장하는 스크립트이다.
+실행 결과 로그는 '~/GraduationProject/log/YYYY-MM-DD/detail/upload_comment_tweet'디렉토리에 저장된다.
+로그의 제목은 현재 스크립트가 실행된 시각으로 'HH:MM:SS.log'형식이다.
+한 로그 파일안에 다음 메인 뉴스 제목 가져오기, char RNN, nmt 모델로부터 댓글 생성, 트윗 업로드 전 과정의 출력이 저장된다.
+
+- input : None
+- output : 로그 파일
+
+> ~:~/GraduationProject/bin$ ./generate_comment_tweet.sh
+
+
