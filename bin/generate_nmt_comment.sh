@@ -1,7 +1,9 @@
 #!/bin/bash
 
 NEWS_TITLE=$1
-DIR_NAME=$(echo "${NEWS_TITLE}" | md5sum | awk '{printf "%s_nmt", $1}')
+#DIR_NAME="$(echo "${NEWS_TITLE}" | awk '{printf "%s", $1}')_$(date +%T)_nmt"
+DIR_NAME="$(date +%T)_nmt"
+#DIR_NAME=$(echo "${NEWS_TITLE}" | md5sum | awk '{printf "%s_nmt", $1}')
 TODAY=$(date '+%Y-%m-%d')
 IN_OUT_DIR=$(echo "../results/${TODAY}/${DIR_NAME}")
 MODEL_DIR=$(echo "../nmt")
