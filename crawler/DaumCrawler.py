@@ -209,7 +209,7 @@ def get_urls_to_be_crawled(args, crawler):
     urls = []
     for date in args.date:
         urls += crawler.get_url_from_date(date)
-    print("Following news articles are going to be crawled:\n" + "\n".join(urls))
+    print("Following news articles are going to be crawled:\n" + "\n".join(urls), file=sys.stderr)
 
     return urls
 
@@ -225,7 +225,7 @@ def save_result(result, total_num, save_path):
     url, news_data = result
     with open(os.path.join(save_path, news_data["id"]), 'w', encoding='utf-8') as f:
         json.dump(news_data, f, ensure_ascii=False)
-    print("Crawled %s, %d/%d has done" % (url, completed_num, total_num))
+    print("Crawled %s, %d/%d has done" % (url, completed_num, total_num), file=sys.stderr)
 
 if __name__ == '__main__':
     os.environ['MOZ_HEADLESS'] = '1'
@@ -236,7 +236,9 @@ if __name__ == '__main__':
 
     pool = Pool(processes=args.process_num)
 
-    print('start crawling')
+    print('start crawling', file=sys.stderr)
     results = [pool.apply_async(crawl, (url,), callback=lambda x: save_result(x, len(urls), args.out_dir)) for url in urls]
     for result in results:
         result.wait()
+
+    print(args.out_dir)
