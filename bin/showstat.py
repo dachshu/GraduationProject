@@ -3,6 +3,9 @@ import argparse
 import os
 from os import path
 import re
+import subprocess as sp
+
+SCRIPT_DIR = path.dirname(path.realpath(__file__))
 
 def parse_arguments(parser):
     parser.add_argument("log_dir", help="Specifies a directory where log files are.")
@@ -38,8 +41,13 @@ def show_status(log_dir, show_all):
         else:
             print(log_data[-1])
 
-        # TODO: show schedule
+        # show schedule
+        output = sp.run([path.join(SCRIPT_DIR, "get_tweet_schedule.sh")], stdout=sp.PIPE, encoding="utf-8")
+        if len(output.stdout) > 0:
+            print("--- Scheduled generation jobs ---")
+            print(output.stdout)
 
+        # show generated comments information
         if LAST_PATTERN.fullmatch(log_data[-1].strip()):
             print("--- Generated comments ---")
             for root, _, files in os.walk(path.join(log_dir, "detail", "upload_comment_tweet")):
