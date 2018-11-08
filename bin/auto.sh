@@ -74,7 +74,7 @@ for t in ${GENERATED_TIMES}; do
         continue
     fi
 
-    echo "/bin/bash -f ${SCRIPT_DIR}/generate_comment_tweet.sh" | at ${HOUR}:${MINUTE}
+    ${SCRIPT_DIR}/enq_generation_at_job.sh ${HOUR}:${MINUTE}
 done
 
 [ ! -z "${GENERATED_TIMES}" ] && (echo "${GENERATED_TIMES}" | tail -1 > "${TIME_GENERATOR_DIR}"/latest_generated_time)
