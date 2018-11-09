@@ -5,6 +5,7 @@ import datetime
 import json
 import argparse
 import sys
+import functools
 from multiprocessing import Pool, Queue
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
@@ -15,7 +16,7 @@ from selenium.webdriver.support import expected_conditions as EC
 SCRIPT_PATH = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 def get_new_browser():
-    return webdriver.Firefox("/home/cjy/.local/bin")
+    return webdriver.Firefox()
 
 class DaumCrawler:
     def __init__(self):
@@ -195,35 +196,39 @@ class DaumCrawler:
 
 def get_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('date', nargs='+', help='date to crawl. the format is YYYYMMDD. ex)20180211')
+    parser.add_argument('date', nargs="+", help='date to crawl. the format is YYYYMMDD. ex)20180211')
     parser.add_argument('out_dir', type=str, help='The directory where crawled news articles are going to be saved.')
     parser.add_argument('-p', '--process_num', type=int, help='number of worker process')
     args = parser.parse_args()
 
     if not os.path.isdir(args.out_dir):
-        parser.error("out_dir should be a directory.")
+        os.makedirs(args.out_dir, exist_ok=True)
 
     return args
 
 def get_urls_to_be_crawled(args, crawler):
     urls = []
     for date in args.date:
-        urls += crawler.get_url_from_date(date)
-    print("Following news articles are going to be crawled:\n" + "\n".join(urls), file=sys.stderr)
+        urls.append((date, crawler.get_url_from_date(date)))
+    print("Following news articles are going to be crawled:", file=sys.stderr)
+    for (_, url) in urls:
+        print("\n".join(url), file=sys.stderr)
 
     return urls
 
-def crawl(url):
+def crawl(url, date):
     news_data = DaumCrawler.crawl_url(get_new_browser(), url)
-    return (url, news_data)
+    return (url, news_data, date)
 
 completed_num = 0
 
 def save_result(result, total_num, save_path):
     global completed_num
     completed_num += 1
-    url, news_data = result
-    with open(os.path.join(save_path, news_data["id"]), 'w', encoding='utf-8') as f:
+    url, news_data, date = result
+    dir_path = os.path.join(save_path, date)
+    os.makedirs(dir_path, exist_ok=True)
+    with open(os.path.join(dir_path, news_data["id"]), 'w', encoding='utf-8') as f:
         json.dump(news_data, f, ensure_ascii=False)
     print("Crawled %s, %d/%d has done" % (url, completed_num, total_num), file=sys.stderr)
 
@@ -237,8 +242,12 @@ if __name__ == '__main__':
     pool = Pool(processes=args.process_num)
 
     print('start crawling', file=sys.stderr)
-    results = [pool.apply_async(crawl, (url,), callback=lambda x: save_result(x, len(urls), args.out_dir)) for url in urls]
+    results = []
+    total_len = functools.reduce(lambda x,y: x+y, (len(url) for _, url in urls))
+    for date, url in urls:
+        results += [pool.apply_async(crawl, (u,date), callback=lambda x: save_result(x, total_len, args.out_dir)) for u in url]
     for result in results:
         result.wait()
 
-    print(os.path.realpath(args.out_dir))
+    for date in args.date:
+        print(os.path.realpath(os.path.join(args.out_dir, date)))
