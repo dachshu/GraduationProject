@@ -241,4 +241,4 @@ if __name__ == '__main__':
     for result in results:
         result.wait()
 
-    print(args.out_dir)
+    print(os.path.realpath(args.out_dir))
