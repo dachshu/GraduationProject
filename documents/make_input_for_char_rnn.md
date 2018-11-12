@@ -3,13 +3,12 @@
 
 ## 사용법
 ```
-python3 make_input_for_char_rnn.py INPUT_FILE OUT_DIR
+python3 make_input_for_char_rnn.py [INPUT_FILE]
 혹은
-./make_input_for_char_rnn.py INPUT_FILE OUT_DIR
+./make_input_for_char_rnn.py [INPUT_FILE]
 ```
 
-INPUT_FILE : [뉴스 필터 스크립트]가 만들어낸 파일을 지정한다.
-OUT_DIR : 출력파일이 저장될 디렉토리. 이 디렉토리 안에 input.txt란 이름으로 파일이 저장된다. 디렉토리가 없다면 생성한다.
+INPUT_FILE : [뉴스 필터 스크립트]가 만들어낸 파일을 지정한다. 지정되지 않으면 stdin으로 들어오는 데이터를 사용한다.
 
 ## 출력 형식
 개행문자를 구분자로 해서 한 줄에 댓글 하나씩 기록된다.
