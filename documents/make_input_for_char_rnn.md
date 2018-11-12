@@ -21,4 +21,4 @@ INPUT_FILE : [뉴스 필터 스크립트]가 만들어낸 파일을 지정한다
 
 ```
 
-[뉴스 필터 스크립트]:(./news_filter.md)
+[뉴스 필터 스크립트]: ./news_filter.md
