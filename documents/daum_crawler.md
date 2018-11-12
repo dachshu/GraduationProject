@@ -32,3 +32,6 @@ python3 DaumCrawler.py date out_dir [-p PROCESS_NUM]
 * date: 크롤링할 기사들의 날짜를 지정한다. 날짜 포맷은 `yyyymmdd`이다.
 * out_dir: 수집된 기사들이 저장될 디렉토리를 지정한다. 이미 존재하는 디렉토리여야 한다.
 * -p, --process_num: 크롤링에 사용할 worker process의 수를 지정한다.
+
+## 출력 형식
+수집된 기사들이 저장된 디렉토리들을 stdout으로 출력한다.
