@@ -7,13 +7,13 @@ import re
 import shutil
 from os import path
 import os
+import sys
 
 TITLE_SUFFIX="title"
 COMMENT_SUFFIX="comment"
 white_to_space = re.compile(r"\s+")
 
 def add_arguments(parser):
-    parser.add_argument("title_comment_file", type=argparse.FileType(mode='r', encoding='utf-8'), help="a JSON formatted file which has titles and comments of news articles")
     parser.add_argument("out_dir", type=str, help="a directory where title, comment, vocab files will be saved")
     parser.add_argument("-n", "--max_num", type=int, default=7000, help="a maximum number of comments that the output files can have")
     return parser
@@ -62,6 +62,6 @@ if __name__ == "__main__":
     parser = add_arguments(argparse.ArgumentParser())
     args = parser.parse_args()
     if not path.isdir(args.out_dir):
-        os.mkdir(args.out_dir)
-    json_input = json.load(args.title_comment_file)
+        os.makedirs(args.out_dir, exist_ok=True)
+    json_input = json.load(sys.stdin)
     write_output_files(json_input, args.out_dir, args.max_num)
