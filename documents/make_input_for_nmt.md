@@ -3,15 +3,16 @@
 
 ## 사용법
 ```
-python3 make_input_for_nmt.py INPUT_FILE OUT_DIR
+python3 make_input_for_nmt.py OUT_DIR [-n MAX_NUM]
 혹은
-./make_input_for_nmt.py INPUT_FILE OUT_DIR
+./make_input_for_nmt.py OUT_DIR [-n MAX_NUM]
 ```
 
-INPUT_FILE : [뉴스 필터 스크립트]가 만들어낸 파일을 지정한다.
 OUT_DIR : 출력파일이 저장될 디렉토리. 이 디렉토리 안에 train, test, dev, vocab 파일들이 저장된다. 디렉토리가 없다면 생성한다.
 
-## 출력 형식
+## 입력 및 출력 형식
+입력의 경우 stdin을 통해 [뉴스 필터](./news_filter.md)의 출력을 전달 받는다.
+
 확장자명에 따라 파일이 담는 내용이 달라진다.  
 `.comment` 확장자를 가진 파일은 각 줄에 댓글 하나씩이 기록되어있다.  
 `.title` 확장자를 가지는 경우 안에는 기사의 제목들만 저장된다. 각 기사 제목은 같은 이름에 `.comment` 확장자를 가진 파일 안에 있는 댓글들과 1:1로 매칭된다.
