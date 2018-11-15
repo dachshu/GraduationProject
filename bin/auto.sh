@@ -11,7 +11,7 @@ NMT_MODEL_DIR=${NMT_DIR}/save/model
 CRAWL_DATE=$(date '+%Y%m%d' -d "yesterday")
 TODAY=$(date '+%Y-%m-%d')
 RESULT_DIR="${PROJECT_DIR}/results/${TODAY}"
-LOG_DIR="${PROJECT_DIR}/log/${TODAY}"
+LOG_DIR="${PROJECT_DIR}/logs/${TODAY}"
 
 GENERAL_LOG_PATH="${LOG_DIR}/general.log"
 
@@ -20,15 +20,16 @@ mkdir -p "${RESULT_DIR}"
 
 # 어제 뉴스 크롤링
 echo "[INFO] Crawling Daum news" >> ${GENERAL_LOG_PATH}
-${CRAWLER_DIR}/DaumCrawler.py "${CRAWL_DATE}" "${CRAWLED_DATA_DIR}" -p 4
+CRAWLED_PATH=$(${CRAWLER_DIR}/DaumCrawler.py "${CRAWL_DATE}" "${CRAWLED_DATA_DIR}" -p 4)
 
 # 뉴스 필터링
 echo "[INFO] Filtering Daum news" >> ${GENERAL_LOG_PATH}
-${SCRIPT_DIR}/news_filter.py "${CRAWLED_DATA_DIR}/${CRAWL_DATE}" ${RESULT_DIR}/daum_news.json
+FILTERED_DATA=$(echo "${CRAWLED_PATH}" | ${SCRIPT_DIR}/news_filter.py)
 
 # CharRNN 입력 데이터 생성
 echo "[INFO] making input for the Char-RNN model" >> ${GENERAL_LOG_PATH}
-${SCRIPT_DIR}/make_input_for_char_rnn.py "${RESULT_DIR}/daum_news.json" "${RESULT_DIR}/char_rnn_training_input"
+mkdir -p "${RESULT_DIR}/char_rnn_training_input"
+echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_char_rnn.py > "${RESULT_DIR}/char_rnn_training_input/input.txt"
 
 # CharRNN 학습
 if [ -d "${CHAR_RNN_MODEL_DIR}" ]; then
@@ -43,14 +44,15 @@ ${SCRIPT_DIR}/train_char_rnn.sh "${RESULT_DIR}/char_rnn_training_input" "${CHAR_
 NMT_ADDTIONAL_DATE=$(date '+%Y%m%d' -d "2 day ago")
 if [ ! -d "${CRAWLED_DATA_DIR}/${NMT_ADDTIONAL_DATE}" ]; then
     echo "[INFO] Crawling additional news" >> ${GENERAL_LOG_PATH}
-    ${CRAWLER_DIR}/DaumCrawler.py "${NMT_ADDTIONAL_DATE}" "${CRAWLED_DATA_DIR}" -p 4
+    NEWLY_CRAWLED_PATH="$(${CRAWLER_DIR}/DaumCrawler.py ${NMT_ADDTIONAL_DATE} ${CRAWLED_DATA_DIR} -p 4)"
+    CRAWLED_PATH="${CRAWLED_PATH}\n${NEWLY_CRAWLED_PATH}"
 fi
 echo "[INFO] Filtering additional news" >> ${GENERAL_LOG_PATH}
-${SCRIPT_DIR}/news_filter.py "${CRAWLED_DATA_DIR}/${CRAWL_DATE}" "${CRAWLED_DATA_DIR}/${NMT_ADDTIONAL_DATE}" ${RESULT_DIR}/daum_news.json
+FILTERED_DATA=$(echo -e "${CRAWLED_PATH}" | ${SCRIPT_DIR}/news_filter.py)
 
 # NMT 입력 데이터 생성
 echo "[INFO] making input for the NMT model" >> ${GENERAL_LOG_PATH}
-${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/daum_news.json" "${RESULT_DIR}/nmt_training_input"
+echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/nmt_training_input"
 
 # NMT 학습
 echo "[INFO] Training the NMT model" >> ${GENERAL_LOG_PATH}
