@@ -1,20 +1,22 @@
-# get daum main news script
-스크립트 실행 시점 다음(Daum) 모바일 페이지 메인 뉴스 상위 5개 뉴스중 임의로 하나를 선택 해
+# GetDaumMainNews
+스크립트 실행 시점 다음(Daum) 모바일 페이지 메인 뉴스 상위 5개 뉴스의 url들을 출력한다
 선택한 뉴스의 제목과 URL을 출력한다
 - input : None
-- output : 제목 '\n' URL
+- output : '\n'으로 구분된 뉴스 URL들
 
-> ~:~/GraduationProject/bin$ ./get_daum_main_news.sh
+> ~:~/GraduationProject/bin$ ./get_daum_main_news.py
+
+# get daum news title.py
+다음(daum)뉴스의 url을 입력 받아 해당 뉴스의 title을 출력한다.
+- input : daum news url
+- output : 뉴스의 title text
 
 
 # generate charRNN/nmt comment script
 입력받은 기사 제목 텍스트를 charRNN/nmt 모델에 입력으로 넣어 댓글 텍스트를 생성한다.
-이때 생성한 댓글 텍스트는 '~/GraduationProject/results/TODAY/(title text의 첫글자_실행시각)_charRNN[nmt]'
-디렉토리 안의 'output.txt'에 저장된다.
-(nmt 모델의 경우 도커에서 한국어 글자 인식 문제로 인해'실행시각_nmt'에 저장된다)
 
 - input : 기사제목 텍스트 ( parameter로 입력)
-- output : 생성한 댓글이 있는 디렉토리 경로
+- output : 생성한 댓글 텍스트
 
 > ~:~/GraduationProject/bin$ ./generate_charRNN_comment.sh "title text"
 
@@ -38,7 +40,7 @@
 댓글 생성 및 트윗 업로드 at job에 이용된다.
 
 - input : None
-- output : 생성한 트윗 텍스트가 있는 디렉토리 경로
+- output : None 
 
 > ~:~/GraduationProject/bin$ ./generate_comment_tweet.sh
 
