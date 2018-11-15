@@ -7,7 +7,6 @@ import sys
 def add_arguments(arg_parser):
     arg_parser.add_argument("archive", nargs="*", help="archives to be filtered")
     arg_parser.add_argument("--dislike_multiplier", type=float, default=2, help="a number to be multiply to dislike count")
-    arg_parser.add_argument("-o", "--out_to", type=argparse.FileType('w', encoding='utf-8'), help="a file to include this program's output") 
     return arg_parser
 
 # 걸러진 댓글들을 반환하는 함수
@@ -47,8 +46,5 @@ if __name__ == "__main__":
         parser.error("The input archives are neither directories nor files")
 
     result = [filter_comment(open(archive), args.dislike_multiplier) for archive in archives]
-    if args.out_to == None:
-        print(json.dumps(result, ensure_ascii=False))
-    else:
-        json.dump(result, args.out_to, ensure_ascii=False)
+    print(json.dumps(result, ensure_ascii=False))
 
