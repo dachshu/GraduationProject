@@ -27,30 +27,34 @@ def write_output_files(json_input, out_dir, max_comment_num):
     #       title 파일에 제목을 작성하고 comment 파일에 댓글 작성
     #       댓글을 공백으로 분리해서 set에 추가
     join_out_path = lambda f: path.join(out_dir, f)
-    open_out_file = lambda p: open(join_out_path(p), 'w', encoding='utf-8')
+    open_out_file = lambda p, mod: open(join_out_path(p), mod, encoding='utf-8')
     vocab = set()
     total_comment_num = 0
 
-    for dic in json_input:
+    for i, dic in enumerate(json_input):
         title = white_to_space.sub(" ", dic["title"])
         vocab.update(title.split(" "))
         comment_it = itertools.islice(map(lambda cmt: white_to_space.sub(" ", cmt), dic["comments"]), max_comment_num - total_comment_num)
         comments = list(comment_it)
         total_comment_num += len(comments)
         train_set_num = int(len(comments)*0.7)
+        
+        is_this_last_item = (i+1) == len(json_input)
+        terminator =  '\n' if not is_this_last_item else ''
+        open_mode = 'a' if i != 0 else 'w'
 
-        with open_out_file("train.title") as train_title, open_out_file("train.comment") as train_comment:
-            train_title.write('\n'.join(itertools.repeat(title, train_set_num)))
-            train_comment.write('\n'.join(comments[:train_set_num]))
+        with open_out_file("train.title", open_mode) as train_title, open_out_file("train.comment", open_mode) as train_comment:
+            train_title.write('\n'.join(itertools.repeat(title, train_set_num)) + terminator)
+            train_comment.write('\n'.join(comments[:train_set_num]) + terminator)
 
-        with open_out_file("test.title") as test_title, open_out_file("test.comment") as test_comment:
-            test_title.write('\n'.join(itertools.repeat(title, len(comments)-train_set_num)))
-            test_comment.write('\n'.join(comments[train_set_num:]))
+        with open_out_file("test.title", open_mode) as test_title, open_out_file("test.comment", open_mode) as test_comment:
+            test_title.write('\n'.join(itertools.repeat(title, len(comments)-train_set_num)) + terminator)
+            test_comment.write('\n'.join(comments[train_set_num:]) + terminator)
 
         for comment in comments:
             vocab.update(comment.split(" "))
 
-    with open_out_file("vocab.title") as vocab_title:
+    with open_out_file("vocab.title", 'w') as vocab_title:
         vocab_title.write('<unk>\n<s>\n</s>\n')
         vocab_title.write('\n'.join(vocab))
 
