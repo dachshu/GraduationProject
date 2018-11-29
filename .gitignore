@@ -18,3 +18,6 @@ crawler/time_archive/
 *.tgz
 TweetUploader/twitter_key
 CommentTimeGenerator/latest_generated_time
+**/*.pyc
+log/*
+geckodriver.log
