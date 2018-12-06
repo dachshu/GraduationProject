@@ -22,21 +22,16 @@
 - [Selenium with Python](http://selenium-python.readthedocs.io/)
 - [Firefox](https://www.mozilla.org/firefox/)
 - [geckodriver](https://github.com/mozilla/geckodriver)
-- Python 3
+- [Python 3](https://www.python.org/)
 
 ## 사용법
-기본 명령
 ```
-python3 DaumCrawler.py
-혹은
-./DaumCrawler.py
+python3 DaumCrawler.py date out_dir [-p PROCESS_NUM]
 ```
 
-옵션
-날짜 포맷은 `YYYYMMDD`이다.
-1. --duration: 날짜 2개를 받아서 두 날짜 사이의 있는 모든 날을 대상으로 크롤링
-2. --date: 날짜들을 여러개 받아서 각 날짜를 크롤링
-3. --url: 특정 기사의 url을 받아서 해당 기사만 크롤링
-4. -p, --process_num: 크롤링에 사용할 worker process의 수
+* date: 크롤링할 기사들의 날짜를 지정한다. 날짜 포맷은 `yyyymmdd`이다.
+* out_dir: 수집된 기사들이 저장될 디렉토리를 지정한다. 이미 존재하는 디렉토리여야 한다.
+* -p, --process_num: 크롤링에 사용할 worker process의 수를 지정한다.
 
-
+## 출력 형식
+수집된 기사들이 저장된 디렉토리들을 stdout으로 출력한다.
