@@ -92,7 +92,7 @@ class Model():
         sampling_type: 0 to use max at each timestep, 1 to sample at each timestep, 2 to sample on spaces
         """
         state = sess.run(self.cell.zero_state(1, tf.float32))
-        print('Generate sample start with:', prime)
+        #print('Generate sample start with:', prime)
         # make rnn state by feeding in prime sequence. 
         prime = prime + '\t'
         for char in prime[:-1]:
@@ -100,7 +100,7 @@ class Model():
                 continue
             x = np.zeros((1, 1)) # 1x1 matrix
             x[0, 0] = vocab[char]
-            print('put this to rnn to make state:', char)
+            #print('put this to rnn to make state:', char)
             feed = {self.input_data: x, self.initial_state: state}
             [state] = sess.run([self.final_state], feed)
 

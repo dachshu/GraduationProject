@@ -13,13 +13,14 @@ CKPT_FILE=${CKPT_FILE%'.index'}
 
 SOURCE_DIR=$(cd $(dirname "$0") && pwd)
 VOLUME_DIR=/nmt
+IN_OUT_DIR=$(echo "/home/cjy/GraduationProject/results")
+INNER_IN_OUT_DIR=/results
 
-INPUT_FILE=${INPUT_FILE//${SOURCE_DIR}/${VOLUME_DIR}}
-OUTPUT_FILE=${OUTPUT_FILE//${SOURCE_DIR}/${VOLUME_DIR}}
+INPUT_FILE=${INPUT_FILE//${IN_OUT_DIR}/${INNER_IN_OUT_DIR}}
+OUTPUT_FILE=${OUTPUT_FILE//${IN_OUT_DIR}/${INNER_IN_OUT_DIR}}
 MODEL_DIR=${MODEL_DIR//${SOURCE_DIR}/${VOLUME_DIR}}
 
-
-nvidia-docker run --rm -v ${SOURCE_DIR}:${VOLUME_DIR} tensorflow/tensorflow:nightly-devel-gpu-py3 bash -c "export PYTHONIOENCODING=UTF-8 && cd /nmt && python3 -m nmt.nmt \
+nvidia-docker run --rm -v ${SOURCE_DIR}:${VOLUME_DIR} -v "${IN_OUT_DIR}:${INNER_IN_OUT_DIR}" tensorflow/tensorflow:nightly-devel-gpu-py3 bash -c "export PYTHONIOENCODING=UTF-8 && cd /nmt && python3 -m nmt.nmt \
     --src=title --tgt=comment \
     --ckpt=${MODEL_DIR}/${CKPT_FILE} \
     --out_dir=${MODEL_DIR} \
@@ -27,3 +28,4 @@ nvidia-docker run --rm -v ${SOURCE_DIR}:${VOLUME_DIR} tensorflow/tensorflow:nigh
     --share_vocab \
     --inference_input_file="${INPUT_FILE}" \
     --inference_output_file="${OUTPUT_FILE}""
+
