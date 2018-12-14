@@ -2,6 +2,7 @@
 
 import sys
 import requests
+import argparse
 from bs4 import BeautifulSoup
 
 def get_article_title(url):
@@ -11,6 +12,20 @@ def get_article_title(url):
     
     return soup.find('h3', class_='tit_view').text
 
+
+def parse_argments(parser):
+    parser.add_argument("urls", nargs="*", help="specify an url from which you get a title")
+    return parser.parse_args()
+    
+
 if __name__ == '__main__':
-    print(get_article_title(sys.argv[1]))
+    parser = argparse.ArgumentParser()
+    args = parse_argments(parser)
+
+    urls = args.urls
+    if len(urls) == 0:
+        urls = [u.strip() for u in sys.stdin.readlines()]
+
+    for url in urls:
+        print(get_article_title(url))
 
