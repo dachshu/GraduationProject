@@ -1,5 +1,29 @@
 #!/bin/bash
 
+echoerr() {
+    echo "$@" 1>&2
+}
+
+function print_help() {
+    echoerr "This script runs automatic training and register jobs to generate comments."
+    echoerr "It receives no arguments."
+    exit 1
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h|--help)
+            print_help
+            shift
+            ;;
+        *)
+            echoerr "\"$1\" is an invalid argument."
+            print_help
+            shift
+            ;;
+    esac
+done
+
 PROJECT_DIR=$(cd $(dirname $0)/.. && pwd)
 SCRIPT_DIR="${PROJECT_DIR}/bin"
 CRAWLER_DIR=${PROJECT_DIR}/crawler
