@@ -14,7 +14,12 @@ def get_article_title(url):
 
 
 def parse_argments(parser):
-    parser.add_argument("urls", nargs="*", help="specify an url from which you get a title")
+    parser.add_argument(
+            "urls",
+            nargs="*",
+            help="""specify an url from which you get a title.
+            if this arguments are not provided, the scripts would read urls from STDIN"""
+            )
     return parser.parse_args()
     
 
