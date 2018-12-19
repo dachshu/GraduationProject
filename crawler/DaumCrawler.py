@@ -16,7 +16,7 @@ from selenium.webdriver.support import expected_conditions as EC
 SCRIPT_PATH = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 def get_new_browser():
-    return webdriver.Firefox()
+    return webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
 
 class DaumCrawler:
     def __init__(self):
