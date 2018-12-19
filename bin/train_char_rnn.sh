@@ -1,12 +1,46 @@
 #!/bin/bash
 
-INPUT_DIR=$1
-OUTPUT_DIR=$2
-OLD_MODEL_DIR=$3
+echoerr() {
+    echo "$@" 1>&2
+}
 
-if [ ! -d "${INPUT_DIR}" ]; then
-    >2& echo "argument 1(INPUT_DIR) doesn't exist"; exit 1
+function print_help() {
+    echoerr "usage: train_char_rnn.sh INPUT_DIR OUTPUT_DIR [OLD_MODEL_DIR]"
+    echoerr "   INPUT_DIR : a directory where input data is in"
+    echoerr "   OUTPUT_DIR : a directory where a trained model will be saved in"
+    echoerr "   OLD_MODEL_DIR : a directory where a previous trained model has been saved in"
+    exit 1
+}
+
+POSITIONAL=()
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h|--help)
+            print_help
+            shift
+            ;;
+        -*|--*)
+            echoerr "\"$1\" is an invalid argument."
+            print_help
+            shift
+            ;;
+        *)
+            POSITIONAL+=("$1")
+            shift
+            ;;
+    esac
+done
+
+if [ ${#POSITIONAL[@]} -lt 2 ]; then
+    echoerr "this script requires 2 positional arguments."
+    print_help
 fi
+
+INPUT_DIR=${POSITIONAL[0]}
+OUTPUT_DIR=${POSITIONAL[1]}
+OLD_MODEL_DIR=${POSITIONAL[2]}
+
 mkdir -p "${OUTPUT_DIR}"
 
 if [ -d "${OLD_MODEL_DIR}" ]; then

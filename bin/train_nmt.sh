@@ -1,11 +1,43 @@
 #!/bin/bash
 
-INPUT_DIR=$1
-OUTPUT_DIR=$2
+echoerr() {
+    echo "$@" 1>&2
+}
 
-if [ ! -d "${INPUT_DIR}" ]; then
-    >&2 echo "argument 1(INPUT_DIR) is not a directory"; exit 1
+function print_help() {
+    echoerr "usage: train_nmt.sh INPUT_DIR OUTPUT_DIR"
+    echoerr "   INPUT_DIR : a directory where input data is in"
+    echoerr "   OUTPUT_DIR : a directory where trained model will be saved in"
+    exit 1
+}
+
+POSITIONAL=()
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h|--help)
+            print_help
+            shift
+            ;;
+        -*|--*)
+            echoerr "\"$1\" is an invalid argument."
+            print_help
+            shift
+            ;;
+        *)
+            POSITIONAL+=("$1")
+            shift
+            ;;
+    esac
+done
+
+if [ ${#POSITIONAL[@]} -lt 2 ]; then
+    echoerr "this script requires 2 positional arguments."
+    print_help
 fi
+
+INPUT_DIR=${POSITIONAL[0]}
+OUTPUT_DIR=${POSITIONAL[1]}
 
 mkdir -p "${OUTPUT_DIR}"
 
