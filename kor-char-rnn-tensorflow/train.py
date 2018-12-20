@@ -75,17 +75,18 @@ def train(args):
             assert vars(saved_model_args)[checkme]==vars(args)[checkme],"Command line argument and saved model disagree on '%s' "%checkme
 
         # open saved vocab/dict and check if vocabs/dicts are compatible
-        with open(os.path.join(args.init_from, 'chars_vocab.pkl'), 'rb') as f:
-            saved_chars, saved_vocab = cPickle.load(f)
-        assert saved_chars==data_loader.chars, "Data and loaded model disagree on character set!"
-        assert saved_vocab==data_loader.vocab, "Data and loaded model disagree on dictionary mappings!"
+        #with open(os.path.join(args.init_from, 'chars_vocab.pkl'), 'rb') as f:
+            #saved_chars, saved_vocab = cPickle.load(f)
+        #assert saved_chars==data_loader.chars, "Data and loaded model disagree on character set!"
+        #assert saved_vocab==data_loader.vocab, "Data and loaded model disagree on dictionary mappings!"
 
     if not os.path.isdir(args.save_dir):
         os.makedirs(args.save_dir)
     with open(os.path.join(args.save_dir, 'config.pkl'), 'wb') as f:
         cPickle.dump(args, f)
-    with open(os.path.join(args.save_dir, 'chars_vocab.pkl'), 'wb') as f:
-        cPickle.dump((data_loader.chars, data_loader.vocab), f)
+    if not os.path.exists(os.path.join(args.init_from, 'chars_vocab.pkl')):
+        with open(os.path.join(args.save_dir, 'chars_vocab.pkl'), 'wb') as f:
+            cPickle.dump((data_loader.chars, data_loader.vocab), f)
 
     model = Model(args)
 
