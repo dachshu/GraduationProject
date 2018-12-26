@@ -196,7 +196,6 @@ class DaumCrawler:
 
 def get_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('date', nargs="+", help='date to crawl. the format is YYYYMMDD. ex)20180211')
     parser.add_argument('out_dir', type=str, help='The directory where crawled news articles are going to be saved.')
     parser.add_argument('-p', '--process_num', type=int, help='number of worker process')
     args = parser.parse_args()
@@ -206,9 +205,9 @@ def get_arguments():
 
     return args
 
-def get_urls_to_be_crawled(args, crawler):
+def get_urls_to_be_crawled(dates, crawler):
     urls = []
-    for date in args.date:
+    for date in dates:
         urls.append((date, crawler.get_url_from_date(date)))
     print("Following news articles are going to be crawled:", file=sys.stderr)
     for (_, url) in urls:
@@ -237,7 +236,8 @@ if __name__ == '__main__':
     args = get_arguments()
     
     crawler = DaumCrawler()
-    urls = get_urls_to_be_crawled(args, crawler)
+    dates = [date.strip() for date in sys.stdin.readlines()]
+    urls = get_urls_to_be_crawled(dates, crawler)
 
     pool = Pool(processes=args.process_num)
 
