@@ -12,12 +12,15 @@ def add_arguments(arg_parser):
 # 걸러진 댓글들을 반환하는 함수
 def filter_comment(archive_file, dislike_multiplier):
     archive_dict = json.load(archive_file)
-    title = archive_dict["title"]
+    title = archive_dict["title"].replace("\t", " ")
     comment_list = get_comment_list(archive_dict)
-    result = sorted(comment_list, key=lambda o: o["like"] - o["dislike"]*dislike_multiplier, reverse=True)
-    result = sorted(result, key=lambda o: o["like"], reverse=True)
+    result = sorted(comment_list, key=lambda o: int(o["like"]), reverse=True)
+    result = sorted(result, key=lambda o: int(o["like"]) - int(o["dislike"])*dislike_multiplier, reverse=True)
     result_len = len(result)*0.1
-    return {"title":title.replace("\t", " "), "comments":[cmt["text"].replace("\t", " ") for cmt in result[:int(result_len)]]}
+    result_dict = {"title":title, "comments":[cmt["text"].replace("\t", " ") for cmt in result[:int(result_len)]]}
+    if len(result_dict["comments"]) == 0:
+        print("WARNING: a news item(%s) has no comments" % title, file=sys.stderr)
+    return result_dict
 
 
 # 전체 기록에서 댓글만 반환하는 함수
