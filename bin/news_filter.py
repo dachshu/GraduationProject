@@ -19,7 +19,7 @@ def filter_comment(archive_file, dislike_multiplier):
     result_len = len(result)*0.1
     result_dict = {"title":title, "comments":[cmt["text"].replace("\t", " ") for cmt in result[:int(result_len)]]}
     if len(result_dict["comments"]) == 0:
-        print("WARNING: a news item(%s) has no comments" % title, file=sys.stderr)
+        print("WARNING: a news item(\'%s\', in \'%s\') has no comments" % (title, archive_file.name), file=sys.stderr)
     return result_dict
 
 
