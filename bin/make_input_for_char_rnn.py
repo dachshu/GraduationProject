@@ -14,6 +14,10 @@ def print_pairs(json_input):
     for dic in json_input:
         title = dic["title"].replace("\n", " ")
         comments = dic["comments"]
+        if len(comments) == 0:
+            print("WARNING: a news item has no comments. so it is ignored.", file=sys.stderr)
+            continue
+
         sys.stdout.write(title + "\t" + comments[0].replace("\n", " "))
         for comment in comments[1:]:
             sys.stdout.write("\n" + title + "\t" + comment.replace("\n", " "))
