@@ -251,5 +251,5 @@ if __name__ == '__main__':
     for result in results:
         result.wait()
 
-    for date in args.date:
+    for date in dates:
         print(os.path.realpath(os.path.join(args.out_dir, date)))
