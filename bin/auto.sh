@@ -4,6 +4,10 @@ echoerr() {
     echo "$@" 1>&2
 }
 
+function exit_if_err() {
+    [ $? -ne 0 ] && echo "[ERROR] Error has occurred in "$@"" && exit $?
+}
+
 function print_help() {
     echoerr "This script runs automatic training and register jobs to generate comments."
     echoerr "It receives no arguments."
@@ -36,24 +40,28 @@ CRAWL_DATE=$(date '+%Y%m%d' -d "yesterday")
 TODAY=$(date '+%Y-%m-%d')
 RESULT_DIR="${PROJECT_DIR}/results/${TODAY}"
 LOG_DIR="${PROJECT_DIR}/logs/${TODAY}"
+DETAIL_LOG_DIR="${PROJECT_DIR}/logs/${TODAY}/detail"
 
 GENERAL_LOG_PATH="${LOG_DIR}/general.log"
 
 mkdir -p "${LOG_DIR}"
 mkdir -p "${RESULT_DIR}"
+mkdir -p "${DETAIL_LOG_DIR}"
 
 # 어제 뉴스 크롤링
 echo "[INFO] Crawling Daum news" >> ${GENERAL_LOG_PATH}
-CRAWLED_PATH=$(${CRAWLER_DIR}/DaumCrawler.py "${CRAWL_DATE}" "${CRAWLED_DATA_DIR}" -p 4)
+CRAWLED_PATH=$(echo "${CRAWL_DATE}" | "${CRAWLER_DIR}/DaumCrawler.py" "${CRAWLED_DATA_DIR}" -p 4 2> "${DETAIL_LOG_DIR}/crawling.log")
+exit_if_err "crawling"
 
 # 뉴스 필터링
 echo "[INFO] Filtering Daum news" >> ${GENERAL_LOG_PATH}
-FILTERED_DATA=$(echo "${CRAWLED_PATH}" | ${SCRIPT_DIR}/news_filter.py)
+FILTERED_DATA=$(echo "${CRAWLED_PATH}" | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_LOG_DIR}/filtering_for_char_rnn.log")
+exit_if_err "filtering for CharRNN"
 
 # CharRNN 입력 데이터 생성
 echo "[INFO] making input for the Char-RNN model" >> ${GENERAL_LOG_PATH}
 mkdir -p "${RESULT_DIR}/char_rnn_training_input"
-echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_char_rnn.py > "${RESULT_DIR}/char_rnn_training_input/input.txt"
+echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_char_rnn.py > "${RESULT_DIR}/char_rnn_training_input/input.txt" 2> "${DETAIL_LOG_DIR}/char_rnn_input_making.log"
 
 # CharRNN 학습
 if [ -d "${CHAR_RNN_MODEL_DIR}" ]; then
@@ -62,31 +70,38 @@ if [ -d "${CHAR_RNN_MODEL_DIR}" ]; then
 else
     echo "[INFO] Training the Char-RNN model" >> ${GENERAL_LOG_PATH}
 fi
-${SCRIPT_DIR}/train_char_rnn.sh "${RESULT_DIR}/char_rnn_training_input" "${CHAR_RNN_MODEL_DIR}" ${CHAR_RNN_OPTION}
+${SCRIPT_DIR}/train_char_rnn.sh "${RESULT_DIR}/char_rnn_training_input" "${CHAR_RNN_MODEL_DIR}" ${CHAR_RNN_OPTION} 2> "${DETAIL_LOG_DIR}/training_char_rnn.log"
+exit_if_err "CharRNN training"
 
 # NMT용 2일치 학습 데이터 준비
-NMT_ADDTIONAL_DATE=$(date '+%Y%m%d' -d "2 day ago")
-if [ ! -d "${CRAWLED_DATA_DIR}/${NMT_ADDTIONAL_DATE}" ]; then
+NMT_ADDITIONAL_DATE=$(date '+%Y%m%d' -d "2 day ago")
+if [ ! -d "${CRAWLED_DATA_DIR}/${NMT_ADDITIONAL_DATE}" ]; then
     echo "[INFO] Crawling additional news" >> ${GENERAL_LOG_PATH}
-    NEWLY_CRAWLED_PATH="$(${CRAWLER_DIR}/DaumCrawler.py ${NMT_ADDTIONAL_DATE} ${CRAWLED_DATA_DIR} -p 4)"
+    NEWLY_CRAWLED_PATH="$(echo "${NMT_ADDITIONAL_DATE}" | ${CRAWLER_DIR}/DaumCrawler.py ${CRAWLED_DATA_DIR} -p 4 2> "${DETAIL_LOG_DIR}/crawling_for_nmt.log")"
+    exit_if_err "crawling for NMT"
     CRAWLED_PATH="${CRAWLED_PATH}\n${NEWLY_CRAWLED_PATH}"
+else
+    CRAWLED_PATH="${CRAWLED_PATH}\n${CRAWLED_DATA_DIR}/${NMT_ADDITIONAL_DATE}"
 fi
 echo "[INFO] Filtering additional news" >> ${GENERAL_LOG_PATH}
-FILTERED_DATA=$(echo -e "${CRAWLED_PATH}" | ${SCRIPT_DIR}/news_filter.py)
+FILTERED_DATA=$(echo -e "${CRAWLED_PATH}" | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_LOG_DIR}/filtering_for_nmt.log")
+exit_if_err "filtering for NMT"
 
 # NMT 입력 데이터 생성
 echo "[INFO] making input for the NMT model" >> ${GENERAL_LOG_PATH}
-echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/nmt_training_input"
+echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/nmt_training_input" 2> "${DETAIL_LOG_DIR}/nmt_input_making.log"
 
 # NMT 학습
 echo "[INFO] Training the NMT model" >> ${GENERAL_LOG_PATH}
-${SCRIPT_DIR}/train_nmt.sh "${RESULT_DIR}/nmt_training_input" "${NMT_MODEL_DIR}"
+${SCRIPT_DIR}/train_nmt.sh "${RESULT_DIR}/nmt_training_input" "${NMT_MODEL_DIR}" 2> "${DETAIL_LOG_DIR}/training_nmt.log"
+exit_if_err "NMT training"
 
 TIME_GENERATOR_DIR=${PROJECT_DIR}/CommentTimeGenerator
 LATEST_TIME=$(([ -f "${TIME_GENERATOR_DIR}"/latest_generated_time ] && cat "${TIME_GENERATOR_DIR}"/latest_generated_time) || echo "0")
 
 echo "[INFO] Generating schedules" >> ${GENERAL_LOG_PATH}
-GENERATED_TIMES=$("${TIME_GENERATOR_DIR}"/TimeModel.py sample "${LATEST_TIME}")
+GENERATED_TIMES=$("${TIME_GENERATOR_DIR}"/TimeModel.py sample "${LATEST_TIME}" 2> "${DETAIL_LOG_DIR}/generating_schedule.log")
+exit_if_err "schedule generating"
 
 for t in ${GENERATED_TIMES}; do
     HOUR=$(echo "${t}/3600" | bc)
