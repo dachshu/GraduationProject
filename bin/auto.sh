@@ -56,7 +56,6 @@ exit_if_err "crawling"
 
 # 뉴스 필터링
 echo "[INFO] Filtering Daum news" >> ${GENERAL_LOG_PATH}
-CRAWLED_PATH="${CRAWLED_DATA_DIR}/20190101"
 FILTERED_DATA=$(echo "${CRAWLED_PATH}" | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_LOG_DIR}/filtering_for_char_rnn.log")
 exit_if_err "filtering for CharRNN"
 
