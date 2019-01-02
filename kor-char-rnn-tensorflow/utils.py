@@ -3,6 +3,7 @@ import os
 import collections
 from six.moves import cPickle
 import numpy as np
+import sys
 
 
 class TextLoader():
@@ -17,10 +18,10 @@ class TextLoader():
         tensor_file = os.path.join(data_dir, "data.npy")
 
         if not (os.path.exists(vocab_file)):
-            print("reading text file")
+            print("reading text file", file=sys.stderr)
             self.preprocess(input_file, vocab_file, tensor_file)
         else:
-            print("loading preprocessed files")
+            print("loading preprocessed files", file=sys.stderr)
             self.load_preprocessed(input_file, vocab_file, tensor_file)
         self.create_batches()
         self.reset_batch_pointer()
