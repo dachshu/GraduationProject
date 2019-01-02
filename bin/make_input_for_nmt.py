@@ -36,6 +36,10 @@ def write_output_files(json_input, out_dir, max_comment_num):
         vocab.update(title.split(" "))
         comment_it = itertools.islice(map(lambda cmt: white_to_space.sub(" ", cmt), dic["comments"]), max_comment_num - total_comment_num)
         comments = list(comment_it)
+        if len(comments) == 0:
+            print("WARNING: a news item has no comments. so it is ignored.", file=sys.stderr)
+            continue
+
         total_comment_num += len(comments)
         train_set_num = int(len(comments)*0.7)
         
