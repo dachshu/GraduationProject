@@ -10,6 +10,7 @@ from utils import TextLoader
 from model import Model
 
 from tqdm import tqdm
+import sys
 
 
 def main():
