@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echoerr() {
-    echo "$@" 1>&2
+    echo -e "$@" 1>&2
 }
 
 function print_help() {
@@ -103,6 +103,7 @@ LATEST_TIME=$(([ -f "${TIME_GENERATOR_DIR}"/latest_generated_time ] && cat "${TI
 echo "[INFO] Generating schedules" >> ${GENERAL_LOG_PATH}
 GENERATED_TIMES=$("${TIME_GENERATOR_DIR}"/TimeModel.py sample "${LATEST_TIME}" 2> "${DETAIL_K_LOG_DIR}/generating_schedule.log")
 exit_if_err "schedule generating"
+echo -e "The generated schedules:\n${GENERATED_TIMES}" >> "${DETAIL_K_LOG_DIR}/generating_schedule.log"
 
 for t in ${GENERATED_TIMES}; do
     HOUR=$(echo "${t}/3600" | bc)
