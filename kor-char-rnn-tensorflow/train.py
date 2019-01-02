@@ -55,7 +55,6 @@ def main():
 
 def train(args):
     data_loader = TextLoader(args.data_dir, args.batch_size, args.seq_length)
-    args.vocab_size = data_loader.vocab_size
 
     # check compatibility if training is continued from previously saved model
     if args.init_from is not None:
@@ -80,6 +79,8 @@ def train(args):
             data_loader.chars, data_loader.vocab, data_loader.vocab_size = saved_chars, saved_vocab, len(saved_chars)
         #assert saved_chars==data_loader.chars, "Data and loaded model disagree on character set!"
         #assert saved_vocab==data_loader.vocab, "Data and loaded model disagree on dictionary mappings!"
+
+    args.vocab_size = data_loader.vocab_size
 
     if not os.path.isdir(args.save_dir):
         os.makedirs(args.save_dir)
