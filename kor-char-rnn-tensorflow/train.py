@@ -10,6 +10,7 @@ from utils import TextLoader
 from model import Model
 
 from tqdm import tqdm
+import sys
 
 
 def main():
@@ -55,7 +56,6 @@ def main():
 
 def train(args):
     data_loader = TextLoader(args.data_dir, args.batch_size, args.seq_length)
-    args.vocab_size = data_loader.vocab_size
 
     # check compatibility if training is continued from previously saved model
     if args.init_from is not None:
@@ -80,6 +80,8 @@ def train(args):
             data_loader.chars, data_loader.vocab, data_loader.vocab_size = saved_chars, saved_vocab, len(saved_chars)
         #assert saved_chars==data_loader.chars, "Data and loaded model disagree on character set!"
         #assert saved_vocab==data_loader.vocab, "Data and loaded model disagree on dictionary mappings!"
+
+    args.vocab_size = data_loader.vocab_size
 
     if not os.path.isdir(args.save_dir):
         os.makedirs(args.save_dir)
@@ -130,7 +132,7 @@ def train(args):
                 print("{}/{} (epoch {}), train_loss = {:.3f}, time/batch = {:.3f}"
                       .format(e * data_loader.num_batches + b,
                               args.num_epochs * data_loader.num_batches,
-                              e, train_loss, end - start))
+                              e, train_loss, end - start), file=sys.stderr)
                 if (e * data_loader.num_batches + b) % args.save_every == 0\
                         or (e == args.num_epochs-1 and
                             b == data_loader.num_batches-1):
@@ -138,7 +140,7 @@ def train(args):
                     checkpoint_path = os.path.join(args.save_dir, 'model.ckpt')
                     saver.save(sess, checkpoint_path,
                                global_step=e * data_loader.num_batches + b)
-                    print("model saved to {}".format(checkpoint_path))
+                    print("model saved to {}".format(checkpoint_path), file=sys.stderr)
 
 
 if __name__ == '__main__':
