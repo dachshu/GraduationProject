@@ -4,10 +4,6 @@ echoerr() {
     echo "$@" 1>&2
 }
 
-function exit_if_err() {
-    [ $? -ne 0 ] && echo "[ERROR] Error has occurred in "$@"" && exit $?
-}
-
 function print_help() {
     echoerr "This script runs automatic training and register jobs to generate comments."
     echoerr "It receives no arguments."
@@ -48,6 +44,11 @@ mkdir -p "${LOG_DIR}"
 mkdir -p "${RESULT_DIR}"
 mkdir -p "${DETAIL_LOG_DIR}"
 
+function exit_if_err() {
+    ERR_CODE=$?
+    [ ${ERR_CODE} -ne 0 ] && echo "[ERROR] Error has occurred in "$@"" >> "${GENERAL_LOG_PATH}" && exit ${ERR_CODE}
+}
+
 # 어제 뉴스 크롤링
 echo "[INFO] Crawling Daum news" >> ${GENERAL_LOG_PATH}
 CRAWLED_PATH=$(echo "${CRAWL_DATE}" | "${CRAWLER_DIR}/DaumCrawler.py" "${CRAWLED_DATA_DIR}" -p 4 2> "${DETAIL_LOG_DIR}/crawling.log")
@@ -55,6 +56,7 @@ exit_if_err "crawling"
 
 # 뉴스 필터링
 echo "[INFO] Filtering Daum news" >> ${GENERAL_LOG_PATH}
+CRAWLED_PATH="${CRAWLED_DATA_DIR}/20190101"
 FILTERED_DATA=$(echo "${CRAWLED_PATH}" | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_LOG_DIR}/filtering_for_char_rnn.log")
 exit_if_err "filtering for CharRNN"
 
@@ -64,7 +66,7 @@ mkdir -p "${RESULT_DIR}/char_rnn_training_input"
 echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_char_rnn.py > "${RESULT_DIR}/char_rnn_training_input/input.txt" 2> "${DETAIL_LOG_DIR}/char_rnn_input_making.log"
 
 # CharRNN 학습
-if [ -d "${CHAR_RNN_MODEL_DIR}" ]; then
+if [ -d "${CHAR_RNN_MODEL_DIR}" ] && [ $(ls "${CHAR_RNN_MODEL_DIR}" | wc -l) -ne 0 ]; then
     echo "[INFO] Training the Char-RNN model from a previous model" >> ${GENERAL_LOG_PATH}
     CHAR_RNN_OPTION="${CHAR_RNN_MODEL_DIR}"
 else
