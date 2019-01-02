@@ -225,6 +225,8 @@ def save_result(result, total_num, save_path):
     global completed_num
     completed_num += 1
     url, news_data, date = result
+    if news_data is None:
+        return
     dir_path = os.path.join(save_path, date)
     os.makedirs(dir_path, exist_ok=True)
     with open(os.path.join(dir_path, news_data["id"]), 'w', encoding='utf-8') as f:
