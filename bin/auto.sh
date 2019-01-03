@@ -102,7 +102,7 @@ TIME_GENERATOR_DIR=${PROJECT_DIR}/CommentTimeGenerator
 LATEST_TIME=$(([ -f "${TIME_GENERATOR_DIR}"/latest_generated_time ] && cat "${TIME_GENERATOR_DIR}"/latest_generated_time) || echo "0")
 
 echo "[INFO] Generating schedules" >> ${GENERAL_LOG_PATH}
-GENERATED_TIMES=$("${TIME_GENERATOR_DIR}"/TimeModel.py sample "${LATEST_TIME}" 2> "${DETAIL_K_LOG_DIR}/generating_schedule.log")
+GENERATED_TIMES=$("${TIME_GENERATOR_DIR}"/TimeModel.py sample --save_dir "${TIME_GENERATOR_DIR}/save" --seed "${LATEST_TIME}" 2> "${DETAIL_K_LOG_DIR}/generating_schedule.log")
 exit_if_err "schedule generating"
 echo -e "The generated schedules:\n${GENERATED_TIMES}" >> "${DETAIL_K_LOG_DIR}/generating_schedule.log"
 
