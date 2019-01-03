@@ -6,10 +6,7 @@ from tensorflow.contrib import rnn
 import os
 from utils import TimeLoader
 import time_preprocess
-import argparse
-
-output_dir = './TimeModelOutput'
-checkpoint_path = os.path.join(output_dir, 'model.ckpt')
+import click
 
 seq_length = 10
 hidden_dim = 128 
@@ -39,9 +36,19 @@ loss = tf.reduce_sum(tf.square(Y_pred - Y)) / 2
 optimizer = tf.train.AdamOptimizer(learning_rate)
 train_op = optimizer.minimize(loss)
 
+@click.group()
+def cli():
+    pass
 
-def train():
-    data_dir = './TimeData'
+@cli.command()
+@click.option('--data_dir', required=True, type=click.Path(exists=True, file_okay=False),
+        help='where a data for training is')
+@click.option('--save_dir', required=True, type=click.Path(exists=True, file_okay=False, writable=True),
+        help='where a model is saved or going to be saved')
+def train(data_dir, save_dir):
+    output_dir = save_dir
+    checkpoint_path = os.path.join(output_dir, 'model.ckpt')
+
     data_loader = TimeLoader(data_dir, batch_size, seq_length)
     with tf.Session() as sess:
         saver = tf.train.Saver(tf.global_variables())
@@ -75,7 +82,13 @@ def train():
         test_predict = sess.run(Y_pred, feed_dict={X: testX, state_batch_size : batch_size})
         print(test_predict)
 
-def sample(seed):
+@cli.command()
+@click.option('--save_dir', required=True, type=click.Path(exists=True, file_okay=False, writable=True),
+        help='where a data for training is')
+@click.option('--seed', required=True, type=int)
+def sample(save_dir, seed):
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    output_dir = save_dir
     num_sampling = 100
 
     with tf.Session() as sess:
@@ -104,22 +117,5 @@ def sample(seed):
                 print(val)
 
 
-def parse_arguments():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('op', choices=['train', 'sample'])
-    parser.add_argument('seed', nargs='?', type=int)
-    args = parser.parse_args()
-
-    if args.op == 'sample' and args.seed is None:
-        parser.error('you should give a seed')
-
-    return args
-
-
 if __name__ == '__main__':
-    args = parse_arguments()
-    if args.op == 'train':
-        train()
-    else:
-        os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-        sample(args.seed)
+    cli()
