@@ -21,4 +21,5 @@ TweetUploader/twitter_key
 CommentTimeGenerator/latest_generated_time
 **/*.pyc
 log/*
+logs/*
 geckodriver.log
