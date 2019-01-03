@@ -6,9 +6,7 @@ from tensorflow.contrib import rnn
 import os
 from utils import TimeLoader
 import time_preprocess
-import argparse
-
-checkpoint_path = os.path.join(output_dir, 'model.ckpt')
+import click
 
 seq_length = 10
 hidden_dim = 128 
@@ -38,10 +36,18 @@ loss = tf.reduce_sum(tf.square(Y_pred - Y)) / 2
 optimizer = tf.train.AdamOptimizer(learning_rate)
 train_op = optimizer.minimize(loss)
 
+@click.group()
+def cli():
+    pass
 
-def train(args):
-    data_dir = args.data_dir
-    output_dir = args.save_dir
+@cli.command()
+@click.option('--data_dir', required=True, type=click.Path(exists=True, file_okay=False),
+        help='where a data for training is')
+@click.option('--save_dir', required=True, type=click.Path(exists=True, file_okay=False, writable=True),
+        help='where a model is saved or going to be saved')
+def train(data_dir, save_dir):
+    output_dir = save_dir
+    checkpoint_path = os.path.join(output_dir, 'model.ckpt')
 
     data_loader = TimeLoader(data_dir, batch_size, seq_length)
     with tf.Session() as sess:
@@ -76,10 +82,13 @@ def train(args):
         test_predict = sess.run(Y_pred, feed_dict={X: testX, state_batch_size : batch_size})
         print(test_predict)
 
-def sample(args):
+@cli.command()
+@click.option('--save_dir', required=True, type=click.Path(exists=True, file_okay=False, writable=True),
+        help='where a data for training is')
+@click.option('--seed', required=True, type=int)
+def sample(save_dir, seed):
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-    seed = args.seed
-    output_dir = args.save_dir
+    output_dir = save_dir
     num_sampling = 100
 
     with tf.Session() as sess:
@@ -108,28 +117,5 @@ def sample(args):
                 print(val)
 
 
-def parse_arguments():
-    parser = argparse.ArgumentParser()
-
-    def directory(string):
-        if not os.path.isdir:
-            raise argparse.ArgumentTypeError("%r is not a directory")
-        return string
-
-    parser.add_argument('-s', '--save_dir', required=True, type=directory, help='where a model is saved or will be saved.')
-    subparser = parser.add_subparsers()
-    training_parser = subparser.add_parser('train')
-    training_parser.add_argument('--data_dir', required=True, type=directory, help='where a data for training is')
-    training_parser.set_defaults(func=train)
-    
-    sampling_parser = subparser.add_parser('sample')
-    sampling_parser.add_argument('--seed', required=True, type=int)
-    sampling_parser.set_defaults(func=sample)
-
-    args = parser.parse_args()
-    return args
-
-
 if __name__ == '__main__':
-    args = parse_arguments()
-    args.func(args)
+    cli()
