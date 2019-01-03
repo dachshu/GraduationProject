@@ -94,7 +94,8 @@ echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/nmt
 
 # NMT 학습
 echo "[INFO] Training the NMT model" >> ${GENERAL_LOG_PATH}
-${SCRIPT_DIR}/train_nmt.sh "${RESULT_DIR}/nmt_training_input" "${NMT_MODEL_DIR}" 2> "${DETAIL_K_LOG_DIR}/training_nmt.log"
+# NMT가 학습과정을 stdout으로 출력하기 때문에 stdout과 stderr를 모두 log로 출력한다.
+${SCRIPT_DIR}/train_nmt.sh "${RESULT_DIR}/nmt_training_input" "${NMT_MODEL_DIR}" &> "${DETAIL_K_LOG_DIR}/training_nmt.log"
 exit_if_err "NMT training"
 
 TIME_GENERATOR_DIR=${PROJECT_DIR}/CommentTimeGenerator
