@@ -13,7 +13,8 @@ char-rnn-tensorflow/output/
 char-rnn-tensorflow/data/
 .vscode
 **/__pycache__/
-CommentTimeGenerator/TimeModelOutput/
+CommentTimeGenerator/save
+CommentTimeGenerator/data
 crawler/time_archive/
 *.tgz
 TweetUploader/twitter_key
