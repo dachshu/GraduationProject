@@ -45,10 +45,10 @@ def show_status(log_dir, show_all):
 
         if LAST_PATTERN.fullmatch(log_data[-1].strip()):
             # show schedule
-            output = sp.run([path.join(SCRIPT_DIR, "get_tweet_schedule.sh")], stdout=sp.PIPE, encoding="utf-8")
+            output = sp.run([path.join(SCRIPT_DIR, "get_tweet_schedule.sh")], stdout=sp.PIPE)
             if len(output.stdout) > 0:
                 print("--- Scheduled generation jobs ---")
-                print(output.stdout)
+                print(output.stdout.decode('utf-8'))
 
             # show generated comments information
             print("--- Generated comments ---")
