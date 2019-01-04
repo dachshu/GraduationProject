@@ -10,7 +10,7 @@ SCRIPT_DIR = path.dirname(path.realpath(__file__))
 TODAY = datetime.date.today().isoformat()
 
 def parse_arguments(parser):
-    parser.add_argument("log_dir", nargs='?', default=path.join(SCRIPT_DIR, "..", "log", TODAY), help="Specifies a directory where log files are.")
+    parser.add_argument("log_dir", nargs='?', default=path.join(SCRIPT_DIR, "..", "logs", TODAY), help="Specifies a directory where log files are.")
     parser.add_argument("-a", "--all", action="store_true", help="Shows entire status, not current status.")
     args = parser.parse_args()
     if not path.isdir(args.log_dir):
