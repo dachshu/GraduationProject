@@ -49,6 +49,10 @@ function exit_if_err() {
     [ ${ERR_CODE} -ne 0 ] && echo "[ERROR] Error has occurred in $@" | tee -a "${GENERAL_LOG_PATH}" 1>&2 && exit ${ERR_CODE}
 }
 
+# exit_if_err 함수에 들어가는 문자열은 에러를 구분하는 용도로 사용되므로
+# 문자열을 변경할 경우 showstat.py 스크립트도 변경된 문자열에 맞춰
+# 수정해야 한다.
+
 # 어제 뉴스 크롤링
 echo "[INFO] Crawling Daum news" >> ${GENERAL_LOG_PATH}
 CRAWLED_PATH=$(echo "${CRAWL_DATE}" | "${CRAWLER_DIR}/DaumCrawler.py" "${CRAWLED_DATA_DIR}" -p 4 2> "${DETAIL_K_LOG_DIR}/crawling.log")
