@@ -46,7 +46,7 @@ mkdir -p "${DETAIL_K_LOG_DIR}"
 
 function exit_if_err() {
     ERR_CODE=$?
-    [ ${ERR_CODE} -ne 0 ] && echo "[ERROR] Error has occurred in "$@"" >> "${GENERAL_LOG_PATH}" && exit ${ERR_CODE}
+    [ ${ERR_CODE} -ne 0 ] && echo "[ERROR] Error has occurred in $@" | tee -a "${GENERAL_LOG_PATH}" 1>&2 && exit ${ERR_CODE}
 }
 
 # 어제 뉴스 크롤링
