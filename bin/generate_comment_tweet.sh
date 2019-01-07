@@ -26,7 +26,7 @@ echo "${NMT_OUTPUT}"
 # tweet generated comments
 echo ""
 echo "[UPLOAD TWEET]"
-TWEET_TEXT="$(echo -e "${NEWS_TITLE}\n${NEWS_URL}\n${CHAR_RNN_OUTPUT}\n${NMT_OUTPUT}")"
+TWEET_TEXT="$(echo -e "${NEWS_TITLE}\n${NEWS_URL}\n${CHAR_RNN_OUTPUT}\n\n${NMT_OUTPUT}")"
 ./upload_tweet.sh "${TWEET_TEXT}"
 
 echo ""
