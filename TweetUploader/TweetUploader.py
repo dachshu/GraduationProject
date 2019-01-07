@@ -4,6 +4,7 @@ import argparse
 import twitter
 import sys
 
+MAX_TWEET_LENGTH=140
 
 def upload_tweet(text, keys):
     api = twitter.Api(consumer_key=keys[0],
@@ -22,7 +23,8 @@ def parse_argument():
 if __name__ == '__main__':
     args = parse_argument()
     keys = [key.strip() for key in args.key.readlines()]
+
     text = sys.stdin.read()
+    text_it = (text[i:i+MAX_TWEET_LENGTH] for i in range(0, len(text), MAX_TWEET_LENGTH))
 
-    upload_tweet(text, keys)
-
+    _ = [upload_tweet(t, keys) for t in text_it]
