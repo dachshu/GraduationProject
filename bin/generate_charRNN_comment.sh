@@ -1,5 +1,10 @@
 #!/bin/bash
 
+function exit_if_err() {
+    ERR_CODE=$?
+    [ ${ERR_CODE} -ne 0 ] && echo "[ERROR] Error has occurred in $@" | tee -a "${GENERAL_LOG_PATH}" 1>&2 && exit ${ERR_CODE}
+}
+
 NEWS_TITLE=$1
 
 if [ -z "${NEWS_TITLE}" ];
@@ -16,4 +21,5 @@ TODAY=$(date '+%Y-%m-%d')
 MODEL_DIR=$(echo "../kor-char-rnn-tensorflow")
 echo -e "${NEWS_TITLE}" | while read title; do
     python3 ${MODEL_DIR}/sample.py --save_dir ${MODEL_DIR}/save/news --prime "$title"
+    exit_if_err "inferring char rnn"
 done
