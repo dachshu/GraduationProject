@@ -11,6 +11,11 @@ function print_help() {
     exit 1
 }
 
+function exit_if_err() {
+    ERR_CODE=$?
+    [ ${ERR_CODE} -ne 0 ] && echo "[ERROR] Error has occurred in $@" | tee -a "${GENERAL_LOG_PATH}" 1>&2 && exit ${ERR_CODE}
+}
+
 POSITIONAL=()
 
 while [ $# -gt 0 ]; do
@@ -38,3 +43,6 @@ fi
 TWEET_UPLOADER_DIR="../TweetUploader"
 
 echo -e "${TWEET_TEXT}" | ${TWEET_UPLOADER_DIR}/TweetUploader.py -k ${TWEET_UPLOADER_DIR}/twitter_key
+exit_if_err "upload tweet"
+
+

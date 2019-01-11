@@ -1,5 +1,11 @@
 #!/bin/bash
 
+function exit_if_err() {
+    ERR_CODE=$?
+    [ ${ERR_CODE} -ne 0 ] && echo "[ERROR] Error has occurred in $@" | tee -a "${GENERAL_LOG_PATH}" 1>&2 && exit ${ERR_CODE}
+}
+
+
 NEWS_TITLE=$1
 if [ -z "${NEWS_TITLE}" ];
 then
@@ -16,6 +22,7 @@ MODEL_DIR=$(echo "../nmt")
 mkdir -p ${IN_OUT_DIR}
 echo -e "${NEWS_TITLE}" > ${IN_OUT_DIR}/input.txt
 ${MODEL_DIR}/infer.sh ${MODEL_DIR}/save/model ${IN_OUT_DIR}/input.txt ${IN_OUT_DIR}/output.txt
+exit_if_err "inferring nmt"
 cat "${IN_OUT_DIR}/output.txt"
 
 
