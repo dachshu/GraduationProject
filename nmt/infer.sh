@@ -29,3 +29,4 @@ nvidia-docker run --rm -v ${SOURCE_DIR}:${VOLUME_DIR} -v "${IN_OUT_DIR}:${INNER_
     --inference_input_file="${INPUT_FILE}" \
     --inference_output_file="${OUTPUT_FILE}""
 
+exit $?
