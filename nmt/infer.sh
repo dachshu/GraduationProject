@@ -13,7 +13,7 @@ CKPT_FILE=${CKPT_FILE%'.index'}
 
 SOURCE_DIR=$(cd $(dirname "$0") && pwd)
 VOLUME_DIR=/nmt
-IN_OUT_DIR=$(echo "/home/cjy/GraduationProject/results")
+IN_OUT_DIR=$(cd "../results" && pwd)
 INNER_IN_OUT_DIR=/results
 
 INPUT_FILE=${INPUT_FILE//${IN_OUT_DIR}/${INNER_IN_OUT_DIR}}
