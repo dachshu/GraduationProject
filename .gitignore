@@ -23,3 +23,8 @@ CommentTimeGenerator/latest_generated_time
 log/*
 logs/*
 geckodriver.log
+models/*
+!models/official
+models/official/transformer/model*
+models/official/transformer/data*/
+models/official/transformer/test_data/
