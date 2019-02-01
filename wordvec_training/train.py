@@ -4,38 +4,48 @@ from gensim import models
 import argparse
 import os
 
-VECTOR_SIZE=1000
-
-def parse():
+def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("train_file", type=argparse.FileType('r', encoding='utf-8'))
-    parser.add_argument("-o", "--output_model_name", default='model')
-    parser.add_argument("--output_wv_name", default='wordvec')
-    parser.add_argument("--output_vocab_name", default='vocab')
-    parser.add_argument("--output_dir", default='./save')
+    parser.add_argument("training_file", type=str, help="a file path which will be used for training. each lines of file is one sentence.")
+    parser.add_argument("-o", "--model_output", type=str, required=True, help="a path where the entire model will be saved")
+    parser.add_argument("--wordvec_output", type=str, help="a path where the keyedvector will be saved in word2vec format")
+    parser.add_argument("--init_model", type=str, help="a path of a model which is going to be used for incremental  training")
+    parser.add_argument("--vec_size", type=int, default=256)
+    parser.add_argument("--min_count", type=int, default=1)
+    parser.add_argument("--window_size", type=int, default=5)
+    parser.add_argument("--worker_num", type=int, default=7)
 
     return parser.parse_args()
 
 if __name__ == '__main__':
-    args = parse()
-    sentences = models.word2vec.LineSentence(args.train_file)
-    output_path = os.path.join(args.output_dir, args.output_model_name)
-    output_wv_path = os.path.join(args.output_dir, args.output_wv_name)
-    output_vocab_path = os.path.join(args.output_dir, args.output_vocab_name)
+    args = parse_args()
 
-    if not os.path.isdir(args.output_dir):
-        os.mkdir(args.output_dir)
-        print("made output directory")
-    if not os.path.isfile(output_path):
-        model = models.word2vec.Word2Vec(sentences=sentences, size=VECTOR_SIZE, workers=4)
+    line_sentences = models.word2vec.LineSentence(args.training_file)
+    is_model_loaded = args.init_model is not None
+    if is_model_loaded:
+        model = models.fasttext.FastText.load(args.init_model)
     else:
-        model = models.word2vec.Word2Vec.load(output_path)
-        model.build_vocab(sentences, update=True)
-        model.train(sentences, total_examples=model.corpus_count, epochs=model.iter)
+        model = models.fasttext.FastText(
+                size=args.vec_size,
+                window=args.window_size,
+                workers=args.worker_num,
+                min_count=args.min_count,
+                sg=1, # use skip-gram
+                )
 
-    print("training compelete")
+    model.build_vocab(
+            sentences=line_sentences,
+            update=is_model_loaded
+            )
+    model.train(
+            sentences=line_sentences,
+            total_examples=model.corpus_count,
+            epochs=model.iter
+            )
 
-    model.save(output_path)
-    print("model is saved")
-    model.wv.save(output_wv_path)
-    print("word vector & vocab are saved")
+    os.makedirs(os.path.dirname(args.model_output), exist_ok=True)
+    model.save(args.model_output)
+
+    if args.wordvec_output is not None:
+        os.makedirs(os.path.dirname(args.wordvec_output), exist_ok=True)
+        model.wv.save_word2vec_format(args.wordvec_output)
