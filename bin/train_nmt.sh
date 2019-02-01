@@ -5,18 +5,25 @@ echoerr() {
 }
 
 function print_help() {
-    echoerr "usage: train_nmt.sh INPUT_DIR OUTPUT_DIR"
+    echoerr "usage: train_nmt.sh INPUT_DIR OUTPUT_DIR [--epoch EPOCH]"
     echoerr "   INPUT_DIR : a directory where input data is in"
     echoerr "   OUTPUT_DIR : a directory where trained model will be saved in"
+    echoerr "   --epoch : training steps"
     exit 1
 }
 
 POSITIONAL=()
+EPOCH=25000
 
 while [ $# -gt 0 ]; do
     case "$1" in
         -h|--help)
             print_help
+            shift
+            ;;
+        --epoch)
+            shift
+            EPOCH=$1
             shift
             ;;
         -*|--*)
@@ -50,19 +57,27 @@ INNER_NMT_DIR=/nmt
 INNER_OUTPUT_DIR=/nmt_output
 INNER_INPUT_DIR=/nmt_input
 
-nvidia-docker run --rm -v "${NMT_DIR}:${INNER_NMT_DIR}" -v "${OUT_DIR}:${INNER_OUTPUT_DIR}" -v "${INPUT_DIR}:${INNER_INPUT_DIR}" \
-    tensorflow/tensorflow:nightly-devel-gpu-py3 \
+cp ${INPUT_DIR}/vocab* -t ${OUTPUT_DIR}
+cp ${INPUT_DIR}/embedding* -t ${OUTPUT_DIR}
+
+nvidia-docker run --rm -v "${NMT_DIR}:${INNER_NMT_DIR}" -v "${OUTPUT_DIR}:${INNER_OUTPUT_DIR}" -v "${INPUT_DIR}:${INNER_INPUT_DIR}" \
+    tensorflow/tensorflow:nightly-gpu-py3 \
     bash -c "export PYTHONIOENCODING=UTF-8 && cd /nmt && python3 -m nmt.nmt \
     --src=title --tgt=comment \
     --vocab_prefix=${INNER_INPUT_DIR}/vocab \
     --train_prefix=${INNER_INPUT_DIR}/train \
     --dev_prefix=${INNER_INPUT_DIR}/dev  \
     --test_prefix=${INNER_INPUT_DIR}/test \
+    --embed_prefix=${INNER_INPUT_DIR}/embedding \
     --out_dir=${INNER_OUTPUT_DIR} \
-    --num_train_steps=12000 \
+    --num_train_steps=${EPOCH} \
     --steps_per_stats=100 \
     --num_layers=2 \
     --num_units=128 \
     --dropout=0.5 \
     --share_vocab \
+    --attention=luong \
+    --attention_architecture=gnmt \
     --metrics=bleu"
+
+exit $?
