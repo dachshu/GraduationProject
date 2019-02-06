@@ -2,7 +2,7 @@
 
 function exit_if_err() {
     ERR_CODE=$?
-    [ ${ERR_CODE} -ne 0 ] && echo "[ERROR] Error has occurred in $@" | tee -a "${GENERAL_LOG_PATH}" 1>&2 && exit ${ERR_CODE}
+    [ ${ERR_CODE} -ne 0 ] && echo "[ERROR] Error has occurred in $@" 1>&2; exit ${ERR_CODE}
 }
 
 TODAY="$(date '+%Y-%m-%d')"
