@@ -12,7 +12,7 @@ function exit_if_err() {
 
 SCRIPT_DIR=$(cd $(dirname $0) && pwd)
 NEWS_TITLE=$1
-NEWS_TITLE=$(echo "${NEWS_TITLE}" | ${SCRIPT_DIR}/seperate_morphemes.py)
+# NEWS_TITLE=$(echo "${NEWS_TITLE}" | ${SCRIPT_DIR}/seperate_morphemes.py)
 echo "${NEWS_TITLE}" 1>&2
 if [ -z "${NEWS_TITLE}" ];
 then
@@ -28,7 +28,7 @@ IN_OUT_DIR=$(echo "../results/${DIR_NAME}")
 MODEL_DIR=$(echo "../nmt")
 mkdir -p ${IN_OUT_DIR}
 echo -e "${NEWS_TITLE}" > ${IN_OUT_DIR}/input.txt
-${MODEL_DIR}/infer.sh ${MODEL_DIR}/save/model ${IN_OUT_DIR}/input.txt ${IN_OUT_DIR}/output.txt
+${MODEL_DIR}/infer.sh ${MODEL_DIR}/save/model ${IN_OUT_DIR}/input.txt ${IN_OUT_DIR}/output.txt 1>&2
 exit_if_err "inferring nmt"
 cat "${IN_OUT_DIR}/output.txt"
 
