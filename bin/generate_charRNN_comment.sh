@@ -2,7 +2,11 @@
 
 function exit_if_err() {
     ERR_CODE=$?
-    [ ${ERR_CODE} -ne 0 ] && echo "[ERROR] Error has occurred in $@" 1>&2; exit ${ERR_CODE}
+    if [ ${ERR_CODE} -ne 0 ]
+    then
+        echo "[ERROR] Error has occurred in $@" 1>&2
+        exit ${ERR_CODE}
+    fi
 }
 
 NEWS_TITLE=$1

@@ -2,11 +2,19 @@
 
 function exit_if_err() {
     ERR_CODE=$?
-    [ ${ERR_CODE} -ne 0 ] && echo "[ERROR] Error has occurred in $@" 1>&2; exit ${ERR_CODE}
+    if [ ${ERR_CODE} -ne 0 ]
+    then
+        echo "[ERROR] Error has occurred in $@" 1>&2
+        exit ${ERR_CODE}
+    fi
 }
 
 
+SCRIPT_DIR=$(cd $(dirname $0) && pwd)
 NEWS_TITLE=$1
+NEWS_TITLE=$(echo "${NEWS_TITLE}" | ${SCRIPT_DIR}/seperate_morphemes.py)
+exit_if_err "seperate news title"
+echo "${NEWS_TITLE}" 1>&2
 if [ -z "${NEWS_TITLE}" ];
 then
     read line
