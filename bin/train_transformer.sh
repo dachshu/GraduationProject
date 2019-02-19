@@ -65,7 +65,8 @@ docker run --runtime=nvidia --rm -u $(id -u):$(id -g) -v "${TRANS_DIR}:${INNER_T
     && python3 transformer_main.py --data_dir ${INNER_DATA_DIR} --model_dir ${INNER_OUTPUT_DIR} \
         --vocab_file ${INNER_DATA_DIR}/vocab \
         --param_set base \
-        --train_epochs ${EPOCH}"
+        --train_epochs ${EPOCH} \
+    && mv ${INNER_DATA_DIR}/vocab -t ${INNER_OUTPUT_DIR}"
 
 exit $?
 
