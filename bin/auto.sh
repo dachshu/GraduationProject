@@ -105,6 +105,14 @@ echo "[INFO] Training the NMT model $(date +"%T")" >> ${GENERAL_LOG_PATH}
 ${SCRIPT_DIR}/train_nmt.sh "${RESULT_DIR}/nmt_training_input" "${NMT_MODEL_DIR}" &> "${DETAIL_K_LOG_DIR}/training_nmt.log"
 exit_if_err "NMT training"
 
+# Transformer 데이터 준비
+echo "[INFO] making input for the Transformer model $(date +"%T")" >> ${GENERAL_LOG_PATH}
+ls -d ${CRAWLED_DATA_DIR}/* | tail -120 | ${SCRIPT_DIR}/news_filter.py | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/transformer_training_input" 2> "${DETAIL_K_LOG_DIR}/transformer_input_making.log"
+
+# Transformer 학습
+echo "[INFO] Training the Transformer model $(date +"%T")" >> ${GENERAL_LOG_PATH}
+${SCRIPT_DIR}/train_transformer.sh "${RESULT_DIR}/transformer_training_input" "${RESULT_DIR}/saved_transformer_model" --epoch 5 2> "${DETAIL_K_LOG_DIR}/training_transformer.log"
+
 TIME_GENERATOR_DIR=${PROJECT_DIR}/CommentTimeGenerator
 LATEST_TIME=$(([ -f "${TIME_GENERATOR_DIR}"/latest_generated_time ] && cat "${TIME_GENERATOR_DIR}"/latest_generated_time) || echo "0")
 
