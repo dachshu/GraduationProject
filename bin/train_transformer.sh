@@ -5,7 +5,7 @@ echoerr() {
 }
 
 function print_help() {
-    echoerr "usage: train_nmt.sh INPUT_DIR OUTPUT_DIR [--epoch EPOCH]"
+    echoerr "usage: $(basename $0) INPUT_DIR OUTPUT_DIR [--epoch EPOCH]"
     echoerr "   INPUT_DIR : a directory where input data is in"
     echoerr "   OUTPUT_DIR : a directory where trained model will be saved in"
     echoerr "   --epoch : training epochs"
