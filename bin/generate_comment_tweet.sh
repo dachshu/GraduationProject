@@ -11,8 +11,8 @@ function exit_if_err() {
 
 TODAY="$(date '+%Y-%m-%d')"
 ###################################################################
-TRANS_MODEL_DIR="../transformer_out"
-TRANS_VOCAB_FILE="../transformer_out/vocab"
+TRANS_MODEL_DIR="../results/saved_transformer_model"
+TRANS_VOCAB_FILE="../results/saved_transformer_model/vocab"
 ###################################################################
 
 
