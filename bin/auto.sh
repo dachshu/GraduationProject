@@ -81,18 +81,9 @@ fi
 ${SCRIPT_DIR}/train_char_rnn.sh "${RESULT_DIR}/char_rnn_training_input" "${CHAR_RNN_MODEL_DIR}" ${CHAR_RNN_OPTION} 2> "${DETAIL_K_LOG_DIR}/training_char_rnn.log"
 exit_if_err "CharRNN training"
 
-# NMT용 2일치 학습 데이터 준비
-NMT_ADDITIONAL_DATE=$(date '+%Y%m%d' -d "2 day ago")
-if [ ! -d "${CRAWLED_DATA_DIR}/${NMT_ADDITIONAL_DATE}" ]; then
-    echo "[INFO] Crawling additional news $(date +"%T")" >> ${GENERAL_LOG_PATH}
-    NEWLY_CRAWLED_PATH="$(echo "${NMT_ADDITIONAL_DATE}" | ${CRAWLER_DIR}/DaumCrawler.py ${CRAWLED_DATA_DIR} -p 4 2> "${DETAIL_K_LOG_DIR}/crawling_for_nmt.log")"
-    exit_if_err "crawling for NMT"
-    CRAWLED_PATH="${CRAWLED_PATH}\n${NEWLY_CRAWLED_PATH}"
-else
-    CRAWLED_PATH="${CRAWLED_PATH}\n${CRAWLED_DATA_DIR}/${NMT_ADDITIONAL_DATE}"
-fi
+# NMT용 14일치 학습 데이터 준비
 echo "[INFO] Filtering additional news $(date +"%T")" >> ${GENERAL_LOG_PATH}
-FILTERED_DATA=$(echo -e "${CRAWLED_PATH}" | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_nmt.log")
+FILTERED_DATA=$(ls -d ${CRAWLED_DATA_DIR}/* | tail -14 | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_nmt.log")
 exit_if_err "filtering for NMT"
 
 # NMT 입력 데이터 생성
