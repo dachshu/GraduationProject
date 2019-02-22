@@ -102,7 +102,7 @@ ls -d ${CRAWLED_DATA_DIR}/* | tail -120 | ${SCRIPT_DIR}/news_filter.py | ${SCRIP
 
 # Transformer 학습
 echo "[INFO] Training the Transformer model $(date +"%T")" >> ${GENERAL_LOG_PATH}
-${SCRIPT_DIR}/train_transformer.sh "${RESULT_DIR}/transformer_training_input" "${RESULT_DIR}/saved_transformer_model" --epoch 5 2> "${DETAIL_K_LOG_DIR}/training_transformer.log"
+${SCRIPT_DIR}/train_transformer.sh "${RESULT_DIR}/transformer_training_input" "${RESULT_DIR}/../saved_transformer_model" --epoch 5 2> "${DETAIL_K_LOG_DIR}/training_transformer.log"
 
 TIME_GENERATOR_DIR=${PROJECT_DIR}/CommentTimeGenerator
 LATEST_TIME=$(([ -f "${TIME_GENERATOR_DIR}"/latest_generated_time ] && cat "${TIME_GENERATOR_DIR}"/latest_generated_time) || echo "0")
