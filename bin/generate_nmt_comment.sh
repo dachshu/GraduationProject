@@ -2,10 +2,16 @@
 
 function exit_if_err() {
     ERR_CODE=$?
-    [ ${ERR_CODE} -ne 0 ] && echo "[ERROR] Error has occurred in $@" | tee -a "${GENERAL_LOG_PATH}" 1>&2 && exit ${ERR_CODE}
+    if [ ${ERR_CODE} -ne 0 ]
+    then
+        echo "[ERROR] Error has occurred in $@" 1>&2
+        exit ${ERR_CODE}
+    fi
 }
 
 
+SCRIPT_DIR=$(cd $(dirname $0) && pwd)
+PROJECT_DIR=${SCRIPT_DIR}/..
 NEWS_TITLE=$1
 if [ -z "${NEWS_TITLE}" ];
 then
@@ -15,14 +21,14 @@ then
         NEWS_TITLE="${NEWS_TITLE}\n${line}"
     done
 fi
+NEWS_TITLE=$(echo -e "${NEWS_TITLE}" | ${SCRIPT_DIR}/seperate_morphemes.py)
+exit_if_err "seperate news title"
+echo "${NEWS_TITLE}" 1>&2
 
-DIR_NAME="nmt"
-IN_OUT_DIR=$(echo "../results/${DIR_NAME}")
-MODEL_DIR=$(echo "../nmt")
-mkdir -p ${IN_OUT_DIR}
-echo -e "${NEWS_TITLE}" > ${IN_OUT_DIR}/input.txt
-${MODEL_DIR}/infer.sh ${MODEL_DIR}/save/model ${IN_OUT_DIR}/input.txt ${IN_OUT_DIR}/output.txt
+in_out_dir="${PROJECT_DIR}/results/nmt"
+model_dir="${PROJECT_DIR}/nmt"
+mkdir -p ${in_out_dir}
+echo -e "${news_title}" > ${in_out_dir}/input.txt
+${model_dir}/infer.sh ${model_dir}/save/model ${in_out_dir}/input.txt ${in_out_dir}/output.txt
 exit_if_err "inferring nmt"
-cat "${IN_OUT_DIR}/output.txt"
-
-
+cat "${in_out_dir}/output.txt"
