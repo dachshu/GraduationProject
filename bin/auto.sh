@@ -56,30 +56,30 @@ function exit_if_err() {
 # 문자열을 변경할 경우 showstat.py 스크립트도 변경된 문자열에 맞춰
 # 수정해야 한다.
 
-# 어제 뉴스 크롤링
-echo "[INFO] Crawling Daum news $(date +"%T")" >> ${GENERAL_LOG_PATH}
-CRAWLED_PATH=$(echo "${CRAWL_DATE}" | "${CRAWLER_DIR}/DaumCrawler.py" "${CRAWLED_DATA_DIR}" -p 4 2> "${DETAIL_K_LOG_DIR}/crawling.log")
-exit_if_err "crawling"
+## 어제 뉴스 크롤링
+#echo "[INFO] Crawling Daum news $(date +"%T")" >> ${GENERAL_LOG_PATH}
+#CRAWLED_PATH=$(echo "${CRAWL_DATE}" | "${CRAWLER_DIR}/DaumCrawler.py" "${CRAWLED_DATA_DIR}" -p 4 2> "${DETAIL_K_LOG_DIR}/crawling.log")
+#exit_if_err "crawling"
 
-# 뉴스 필터링
-echo "[INFO] Filtering Daum news $(date +"%T")" >> ${GENERAL_LOG_PATH}
-FILTERED_DATA=$(echo "${CRAWLED_PATH}" | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_char_rnn.log")
-exit_if_err "filtering for CharRNN"
+## 뉴스 필터링
+#echo "[INFO] Filtering Daum news $(date +"%T")" >> ${GENERAL_LOG_PATH}
+#FILTERED_DATA=$(echo "${CRAWLED_PATH}" | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_char_rnn.log")
+#exit_if_err "filtering for CharRNN"
 
-# CharRNN 입력 데이터 생성
-echo "[INFO] making input for the Char-RNN model $(date +"%T")" >> ${GENERAL_LOG_PATH}
-mkdir -p "${RESULT_DIR}/char_rnn_training_input"
-echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_char_rnn.py > "${RESULT_DIR}/char_rnn_training_input/input.txt" 2> "${DETAIL_K_LOG_DIR}/char_rnn_input_making.log"
+## CharRNN 입력 데이터 생성
+#echo "[INFO] making input for the Char-RNN model $(date +"%T")" >> ${GENERAL_LOG_PATH}
+#mkdir -p "${RESULT_DIR}/char_rnn_training_input"
+#echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_char_rnn.py > "${RESULT_DIR}/char_rnn_training_input/input.txt" 2> "${DETAIL_K_LOG_DIR}/char_rnn_input_making.log"
 
-# CharRNN 학습
-if [ -d "${CHAR_RNN_MODEL_DIR}" ] && [ $(ls "${CHAR_RNN_MODEL_DIR}" | wc -l) -ne 0 ]; then
-    echo "[INFO] Training the Char-RNN model from a previous model $(date +"%T")" >> ${GENERAL_LOG_PATH}
-    CHAR_RNN_OPTION="${CHAR_RNN_MODEL_DIR}"
-else
-    echo "[INFO] Training the Char-RNN model $(date +"%T")" >> ${GENERAL_LOG_PATH}
-fi
-${SCRIPT_DIR}/train_char_rnn.sh "${RESULT_DIR}/char_rnn_training_input" "${CHAR_RNN_MODEL_DIR}" ${CHAR_RNN_OPTION} 2> "${DETAIL_K_LOG_DIR}/training_char_rnn.log"
-exit_if_err "CharRNN training"
+## CharRNN 학습
+#if [ -d "${CHAR_RNN_MODEL_DIR}" ] && [ $(ls "${CHAR_RNN_MODEL_DIR}" | wc -l) -ne 0 ]; then
+    #echo "[INFO] Training the Char-RNN model from a previous model $(date +"%T")" >> ${GENERAL_LOG_PATH}
+    #CHAR_RNN_OPTION="${CHAR_RNN_MODEL_DIR}"
+#else
+    #echo "[INFO] Training the Char-RNN model $(date +"%T")" >> ${GENERAL_LOG_PATH}
+#fi
+#${SCRIPT_DIR}/train_char_rnn.sh "${RESULT_DIR}/char_rnn_training_input" "${CHAR_RNN_MODEL_DIR}" ${CHAR_RNN_OPTION} 2> "${DETAIL_K_LOG_DIR}/training_char_rnn.log"
+#exit_if_err "CharRNN training"
 
 # NMT용 14일치 학습 데이터 준비
 echo "[INFO] Filtering additional news $(date +"%T")" >> ${GENERAL_LOG_PATH}
