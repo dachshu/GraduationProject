@@ -57,12 +57,11 @@ INNER_NMT_DIR=/nmt
 INNER_OUTPUT_DIR=/nmt_output
 INNER_INPUT_DIR=/nmt_input
 
-cp ${INPUT_DIR}/vocab* -t ${OUTPUT_DIR}
-cp ${INPUT_DIR}/embedding* -t ${OUTPUT_DIR}
-
 nvidia-docker run --rm -v "${NMT_DIR}:${INNER_NMT_DIR}" -v "${OUTPUT_DIR}:${INNER_OUTPUT_DIR}" -v "${INPUT_DIR}:${INNER_INPUT_DIR}" \
     tensorflow/tensorflow:nightly-gpu-py3 \
-    bash -c "export PYTHONIOENCODING=UTF-8 && cd /nmt && python3 -m nmt.nmt \
+    bash -c "rm -r "${INNER_OUTPUT_DIR}/*"; \
+    cp ${INNER_INPUT_DIR}/vocab* -t ${INNER_OUTPUT_DIR} \
+    export PYTHONIOENCODING=UTF-8 && cd /nmt && python3 -m nmt.nmt \
     --src=title --tgt=comment \
     --vocab_prefix=${INNER_INPUT_DIR}/vocab \
     --train_prefix=${INNER_INPUT_DIR}/train \
@@ -70,14 +69,12 @@ nvidia-docker run --rm -v "${NMT_DIR}:${INNER_NMT_DIR}" -v "${OUTPUT_DIR}:${INNE
     --test_prefix=${INNER_INPUT_DIR}/test \
     --embed_prefix=${INNER_INPUT_DIR}/embedding \
     --out_dir=${INNER_OUTPUT_DIR} \
-    --num_train_steps=${EPOCH} \
     --steps_per_stats=100 \
     --num_layers=2 \
+    --num_train_steps=${EPOCH} \
     --num_units=128 \
     --dropout=0.5 \
     --share_vocab \
-    --attention=luong \
-    --attention_architecture=gnmt \
     --metrics=bleu"
 
 exit $?
