@@ -6,10 +6,13 @@ from bs4 import BeautifulSoup
 def get_article_url(url):
     ret_url = url
     if 'm.media' in url:
-        rq = requests.get(url)
-        soup = BeautifulSoup(rq.text, 'html.parser')
-        article = soup.select('div.cont_thumb a.link_cont')
-        ret_url = article[0]['href']
+        try:
+            rq = requests.get(url)
+            soup = BeautifulSoup(rq.text, 'html.parser')
+            article = soup.select('div.cont_thumb a.link_cont')
+            ret_url = article[0]['href']
+        except:
+            return None
 
     return ret_url
 
@@ -29,6 +32,7 @@ if __name__ == '__main__':
     num_articles = 5 if len(articles) >= 5 else len(articles)
 
     urls = [get_article_url(article['href']) for article in articles[:num_articles] if is_valid_url(article['href'])]
+    urls = [url for url in urls if url is not None]
     
     for url in urls:
         print(url)

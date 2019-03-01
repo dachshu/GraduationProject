@@ -1,0 +1,6 @@
+[submodule "models"]
+	path = models
+	url = https://github.com/jayong93/models
+[submodule "nmt"]
+	path = nmt
+	url = https://github.com/jayong93/nmt

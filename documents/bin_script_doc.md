@@ -23,6 +23,14 @@
 
 > ~:~/GraduationProject/bin$ ./generate_nmt_comment.sh "title text"
 
+# generate transformer comment script
+입력받은 model, vocabulary, text를 transformer 모델에 입력으로 넣어 댓글 텍스트를 생성한다.
+
+- input: trained-transformer-model-dir(arg1), vocabulary-file(arg2), text(arg3)
+- output: 생성한 댓글 텍스트
+
+> ~:~/GraduationProject/bin$ ./generate_transformer_comment.sh model-dir vocab-file text
+
 
 # upload tweet script
 트위터에 올릴 텍스트를 parameter로 받아 <https://twitter.com/TestTESTJY/>에 업로드한다.
@@ -35,7 +43,7 @@
 
 # generate comment tweet script
 스크립트 실행 시점의 다음(Daum) 모바일 페이지 메인 뉴스 상위 5개중 임의의 1개를 선택하고
-선택한 뉴스 제목에 대한 charRNN, nmt 모델의 댓글을 생성한다.
+선택한 뉴스 제목에 대한 charRNN, nmt, transformer 모델의 댓글을 생성한다.
 또한 생성한 댓글들 결과를 트위터에 업로드한다. 각 모델의 댓글들은 개행문자 '/n'으로 구분된다.
 댓글 생성 및 트윗 업로드 at job에 이용된다.
 
@@ -56,3 +64,5 @@
 > ~:~/GraduationProject/bin$ ./generate_comment_tweet.sh
 
 
+# models/official/transformer/data_preprocess.py
+nmt학습 데이터를 입력 받아 transformer 학습데이터로 변환하는 스크립트

@@ -61,38 +61,29 @@ echo "[INFO] Crawling Daum news $(date +"%T")" >> ${GENERAL_LOG_PATH}
 CRAWLED_PATH=$(echo "${CRAWL_DATE}" | "${CRAWLER_DIR}/DaumCrawler.py" "${CRAWLED_DATA_DIR}" -p 4 2> "${DETAIL_K_LOG_DIR}/crawling.log")
 exit_if_err "crawling"
 
-# 뉴스 필터링
-echo "[INFO] Filtering Daum news $(date +"%T")" >> ${GENERAL_LOG_PATH}
-FILTERED_DATA=$(echo "${CRAWLED_PATH}" | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_char_rnn.log")
-exit_if_err "filtering for CharRNN"
+## 뉴스 필터링
+#echo "[INFO] Filtering Daum news $(date +"%T")" >> ${GENERAL_LOG_PATH}
+#FILTERED_DATA=$(echo "${CRAWLED_PATH}" | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_char_rnn.log")
+#exit_if_err "filtering for CharRNN"
 
-# CharRNN 입력 데이터 생성
-echo "[INFO] making input for the Char-RNN model $(date +"%T")" >> ${GENERAL_LOG_PATH}
-mkdir -p "${RESULT_DIR}/char_rnn_training_input"
-echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_char_rnn.py > "${RESULT_DIR}/char_rnn_training_input/input.txt" 2> "${DETAIL_K_LOG_DIR}/char_rnn_input_making.log"
+## CharRNN 입력 데이터 생성
+#echo "[INFO] making input for the Char-RNN model $(date +"%T")" >> ${GENERAL_LOG_PATH}
+#mkdir -p "${RESULT_DIR}/char_rnn_training_input"
+#echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_char_rnn.py > "${RESULT_DIR}/char_rnn_training_input/input.txt" 2> "${DETAIL_K_LOG_DIR}/char_rnn_input_making.log"
 
-# CharRNN 학습
-if [ -d "${CHAR_RNN_MODEL_DIR}" ] && [ $(ls "${CHAR_RNN_MODEL_DIR}" | wc -l) -ne 0 ]; then
-    echo "[INFO] Training the Char-RNN model from a previous model $(date +"%T")" >> ${GENERAL_LOG_PATH}
-    CHAR_RNN_OPTION="${CHAR_RNN_MODEL_DIR}"
-else
-    echo "[INFO] Training the Char-RNN model $(date +"%T")" >> ${GENERAL_LOG_PATH}
-fi
-${SCRIPT_DIR}/train_char_rnn.sh "${RESULT_DIR}/char_rnn_training_input" "${CHAR_RNN_MODEL_DIR}" ${CHAR_RNN_OPTION} 2> "${DETAIL_K_LOG_DIR}/training_char_rnn.log"
-exit_if_err "CharRNN training"
+## CharRNN 학습
+#if [ -d "${CHAR_RNN_MODEL_DIR}" ] && [ $(ls "${CHAR_RNN_MODEL_DIR}" | wc -l) -ne 0 ]; then
+    #echo "[INFO] Training the Char-RNN model from a previous model $(date +"%T")" >> ${GENERAL_LOG_PATH}
+    #CHAR_RNN_OPTION="${CHAR_RNN_MODEL_DIR}"
+#else
+    #echo "[INFO] Training the Char-RNN model $(date +"%T")" >> ${GENERAL_LOG_PATH}
+#fi
+#${SCRIPT_DIR}/train_char_rnn.sh "${RESULT_DIR}/char_rnn_training_input" "${CHAR_RNN_MODEL_DIR}" ${CHAR_RNN_OPTION} 2> "${DETAIL_K_LOG_DIR}/training_char_rnn.log"
+#exit_if_err "CharRNN training"
 
-# NMT용 2일치 학습 데이터 준비
-NMT_ADDITIONAL_DATE=$(date '+%Y%m%d' -d "2 day ago")
-if [ ! -d "${CRAWLED_DATA_DIR}/${NMT_ADDITIONAL_DATE}" ]; then
-    echo "[INFO] Crawling additional news $(date +"%T")" >> ${GENERAL_LOG_PATH}
-    NEWLY_CRAWLED_PATH="$(echo "${NMT_ADDITIONAL_DATE}" | ${CRAWLER_DIR}/DaumCrawler.py ${CRAWLED_DATA_DIR} -p 4 2> "${DETAIL_K_LOG_DIR}/crawling_for_nmt.log")"
-    exit_if_err "crawling for NMT"
-    CRAWLED_PATH="${CRAWLED_PATH}\n${NEWLY_CRAWLED_PATH}"
-else
-    CRAWLED_PATH="${CRAWLED_PATH}\n${CRAWLED_DATA_DIR}/${NMT_ADDITIONAL_DATE}"
-fi
+# NMT용 14일치 학습 데이터 준비
 echo "[INFO] Filtering additional news $(date +"%T")" >> ${GENERAL_LOG_PATH}
-FILTERED_DATA=$(echo -e "${CRAWLED_PATH}" | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_nmt.log")
+FILTERED_DATA=$(ls -d ${CRAWLED_DATA_DIR}/* | tail -14 | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_nmt.log")
 exit_if_err "filtering for NMT"
 
 # NMT 입력 데이터 생성
@@ -104,6 +95,14 @@ echo "[INFO] Training the NMT model $(date +"%T")" >> ${GENERAL_LOG_PATH}
 # NMT가 학습과정을 stdout으로 출력하기 때문에 stdout과 stderr를 모두 log로 출력한다.
 ${SCRIPT_DIR}/train_nmt.sh "${RESULT_DIR}/nmt_training_input" "${NMT_MODEL_DIR}" &> "${DETAIL_K_LOG_DIR}/training_nmt.log"
 exit_if_err "NMT training"
+
+# Transformer 데이터 준비
+echo "[INFO] making input for the Transformer model $(date +"%T")" >> ${GENERAL_LOG_PATH}
+ls -d ${CRAWLED_DATA_DIR}/* | tail -120 | ${SCRIPT_DIR}/news_filter.py | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/transformer_training_input" 2> "${DETAIL_K_LOG_DIR}/transformer_input_making.log"
+
+# Transformer 학습
+echo "[INFO] Training the Transformer model $(date +"%T")" >> ${GENERAL_LOG_PATH}
+${SCRIPT_DIR}/train_transformer.sh "${RESULT_DIR}/transformer_training_input" "${RESULT_DIR}/../saved_transformer_model" --epoch 5 2> "${DETAIL_K_LOG_DIR}/training_transformer.log"
 
 TIME_GENERATOR_DIR=${PROJECT_DIR}/CommentTimeGenerator
 LATEST_TIME=$(([ -f "${TIME_GENERATOR_DIR}"/latest_generated_time ] && cat "${TIME_GENERATOR_DIR}"/latest_generated_time) || echo "0")
