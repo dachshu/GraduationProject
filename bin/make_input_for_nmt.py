@@ -8,10 +8,12 @@ import shutil
 from os import path
 import os
 import sys
+from konlpy.tag import Mecab
 
 TITLE_SUFFIX="title"
 COMMENT_SUFFIX="comment"
-white_to_space = re.compile(r"\s+")
+white_to_space = re.compile(r"[\s\n]+")
+remove_special_char = re.compile(r"[^가-힣 \.,]")
 
 def add_arguments(parser):
     parser.add_argument("out_dir", type=str, help="a directory where title, comment, vocab files will be saved")
@@ -30,15 +32,27 @@ def write_output_files(json_input, out_dir, max_comment_num):
     open_out_file = lambda p, mod: open(join_out_path(p), mod, encoding='utf-8')
     vocab = set()
     total_comment_num = 0
+    mecab = Mecab()
 
     for i, dic in enumerate(json_input):
         title = white_to_space.sub(" ", dic["title"])
-        vocab.update(title.split(" "))
-        comment_it = itertools.islice(map(lambda cmt: white_to_space.sub(" ", cmt), dic["comments"]), max_comment_num - total_comment_num)
-        comments = list(comment_it)
-        if len(comments) == 0:
-            print("WARNING: a news item has no comments. so it is ignored.", file=sys.stderr)
-            continue
+        title = remove_special_char.sub("", title)
+        print("title:", title, file=sys.stderr)
+        morphs = mecab.morphs(title)
+        print("title morphs:", morphs, file=sys.stderr)
+        vocab.update(morphs)
+        title = ' '.join(morphs)
+        #comment_it = itertools.islice(map(lambda cmt: white_to_space.sub(" ", cmt), dic["comments"]), max_comment_num - total_comment_num)
+        #comments = list(comment_it)
+
+        comments = [remove_special_char.sub("", white_to_space.sub(" ", cmt)) for cmt in dic["comments"]]
+        for j, comment in enumerate(comments):
+            print("comment:", comment, file=sys.stderr)
+            morphs = mecab.morphs(comment)
+            print("comment morphs:", morphs, file=sys.stderr)
+            vocab.update(morphs)
+            comment = ' '.join(morphs)
+            comments[j] = comment
 
         total_comment_num += len(comments)
         train_set_num = int(len(comments)*0.7)
@@ -54,9 +68,6 @@ def write_output_files(json_input, out_dir, max_comment_num):
         with open_out_file("test.title", open_mode) as test_title, open_out_file("test.comment", open_mode) as test_comment:
             test_title.write('\n'.join(itertools.repeat(title, len(comments)-train_set_num)) + terminator)
             test_comment.write('\n'.join(comments[train_set_num:]) + terminator)
-
-        for comment in comments:
-            vocab.update(comment.split(" "))
 
     with open_out_file("vocab.title", 'w') as vocab_title:
         vocab_title.write('<unk>\n<s>\n</s>\n')
