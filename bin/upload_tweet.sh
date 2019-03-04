@@ -14,7 +14,7 @@ function print_help() {
 function exit_if_err() {
     ERR_CODE=$?
     if [ ${ERR_CODE} -ne 0 ]; then
-        echo "[ERROR] Error has occurred in $@ $(date +"%T")" | tee -a "${GENERAL_LOG_PATH}" 1>&2
+        echo "[ERROR] Error has occurred in $@ $(date +"%T")" 1>&2
         exit ${ERR_CODE}
     fi
 }
