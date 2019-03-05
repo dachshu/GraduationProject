@@ -17,7 +17,7 @@ TRANS_VOCAB_FILE="../results/saved_transformer_model/vocab"
 
 
 # get a daum main news's title and url
-echo "[GET A DAUM MAIN NEWS'S TITLE AND URL $(date +"%T")]"
+echo "[$(date +"%T")][GET A DAUM MAIN NEWS'S TITLE AND URL]"
 ARTICLE_URLS=$(./GetDaumMainNews.py)
 exit_if_err "get daum news urls"
 NUM_URLS=$(echo "$ARTICLE_URLS" | wc -l)
@@ -56,10 +56,12 @@ echo "${TRANSFORMER_OUTPUT}"
 # tweet generated comments
 echo ""
 echo "[$(date +"%T")][UPLOAD TWEET]"
-TWEET_TEXT="$(echo -e "${NEWS_TITLE}\n${NEWS_URL}\n${CHAR_RNN_OUTPUT}\n${NMT_OUTPUT}\n${TRANSFORMER_OUTPUT}")"
-./upload_tweet.sh "${TWEET_TEXT}"
+NEWS_NMT_TEXT="$(echo -e "${NEWS_TITLE}\n${NEWS_URL}\n\n${NMT_OUTPUT}")"
+./upload_tweet.sh "${NEWS_NMT_TEXT}"
+exit_if_err "upload tweet"
+./upload_tweet.sh "${TRANSFORMER_OUTPUT}"
 exit_if_err "upload tweet"
 
 echo ""
 echo "[TWEET TEXT]"
-echo "${TWEET_TEXT}"
+echo -e "${NEWS_TITLE}\n${NEWS_URL}\n\n${NMT_OUTPUT}\n\n${TRANSFORMER_OUTPUT}"
