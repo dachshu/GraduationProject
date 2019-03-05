@@ -73,8 +73,8 @@ echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/nmt
 # NMT 학습
 echo "[$(date +"%T")][INFO] Training the NMT model" >> ${GENERAL_LOG_PATH}
 # NMT가 학습과정을 stdout으로 출력하기 때문에 stdout과 stderr를 모두 log로 출력한다.
-${SCRIPT_DIR}/train_nmt.sh "${RESULT_DIR}/nmt_training_input" "${NMT_MODEL_DIR}" --gpu_id 1 &> "${DETAIL_K_LOG_DIR}/training_nmt.log"
-exit_if_err "NMT training"
+${SCRIPT_DIR}/train_nmt.sh "${RESULT_DIR}/nmt_training_input" "${NMT_MODEL_DIR}" --gpu_id 1 &> "${DETAIL_K_LOG_DIR}/training_nmt.log" &
+NMT_TRAINING_PID=$!
 
 # Transformer 데이터 준비
 echo "[$(date +"%T")][INFO] making input for the Transformer model" >> ${GENERAL_LOG_PATH}
@@ -82,7 +82,13 @@ ls -d ${CRAWLED_DATA_DIR}/* | tail -120 | ${SCRIPT_DIR}/news_filter.py | ${SCRIP
 
 # Transformer 학습
 echo "[$(date +"%T")][INFO] Training the Transformer model" >> ${GENERAL_LOG_PATH}
-${SCRIPT_DIR}/train_transformer.sh "${RESULT_DIR}/transformer_training_input" "${RESULT_DIR}/../saved_transformer_model" --epoch 5 2> "${DETAIL_K_LOG_DIR}/training_transformer.log"
+${SCRIPT_DIR}/train_transformer.sh "${RESULT_DIR}/transformer_training_input" "${RESULT_DIR}/../saved_transformer_model" --epoch 5 2> "${DETAIL_K_LOG_DIR}/training_transformer.log" &
+TRANSFORMER_TRAINING_PID=$!
+
+wait ${NMT_TRAINING_PID}
+exit_if_err "NMT training"
+wait ${TRANSFORMER_TRAINING_PID}
+exit_if_err "Transformer training"
 
 TIME_GENERATOR_DIR=${PROJECT_DIR}/CommentTimeGenerator
 LATEST_TIME=$(([ -f "${TIME_GENERATOR_DIR}"/latest_generated_time ] && cat "${TIME_GENERATOR_DIR}"/latest_generated_time) || echo "0")
