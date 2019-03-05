@@ -73,7 +73,7 @@ echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/nmt
 # NMT 학습
 echo "[$(date +"%T")][INFO] Training the NMT model" >> ${GENERAL_LOG_PATH}
 # NMT가 학습과정을 stdout으로 출력하기 때문에 stdout과 stderr를 모두 log로 출력한다.
-${SCRIPT_DIR}/train_nmt.sh "${RESULT_DIR}/nmt_training_input" "${NMT_MODEL_DIR}" &> "${DETAIL_K_LOG_DIR}/training_nmt.log"
+${SCRIPT_DIR}/train_nmt.sh "${RESULT_DIR}/nmt_training_input" "${NMT_MODEL_DIR}" --gpu_id 1 &> "${DETAIL_K_LOG_DIR}/training_nmt.log"
 exit_if_err "NMT training"
 
 # Transformer 데이터 준비
