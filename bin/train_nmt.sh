@@ -9,11 +9,13 @@ function print_help() {
     echoerr "   INPUT_DIR : a directory where input data is in"
     echoerr "   OUTPUT_DIR : a directory where trained model will be saved in"
     echoerr "   --epoch : training steps"
+    echoerr "   --gpu_id : specify a gpu for training"
     exit 1
 }
 
 POSITIONAL=()
 EPOCH=25000
+GPU_ID=0
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -24,6 +26,11 @@ while [ $# -gt 0 ]; do
         --epoch)
             shift
             EPOCH=$1
+            shift
+            ;;
+        --gpu_id)
+            shift
+            GPU_ID=$1
             shift
             ;;
         -*|--*)
@@ -61,7 +68,7 @@ nvidia-docker run --rm -v "${NMT_DIR}:${INNER_NMT_DIR}" -v "${OUTPUT_DIR}:${INNE
     tensorflow/tensorflow:nightly-gpu-py3 \
     bash -c "rm -r "${INNER_OUTPUT_DIR}/*"; \
     cp ${INNER_INPUT_DIR}/vocab* -t ${INNER_OUTPUT_DIR}; \
-    export PYTHONIOENCODING=UTF-8 && cd /nmt && python3 -m nmt.nmt \
+    export PYTHONIOENCODING=UTF-8 && cd /nmt && CUDA_VISIBLE_DEVICES=${GPU_ID} python3 -m nmt.nmt \
     --src=title --tgt=comment \
     --vocab_prefix=${INNER_INPUT_DIR}/vocab \
     --train_prefix=${INNER_INPUT_DIR}/train \
