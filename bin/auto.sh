@@ -110,7 +110,13 @@ for t in ${GENERATED_TIMES}; do
         continue
     fi
 
-    ${SCRIPT_DIR}/enq_generation_at_job.sh ${HOUR}:${MINUTE}
+    ${SCRIPT_DIR}/enq_generation_at_job.sh ${HOUR}:${MINUTE} &>> "${DETAIL_K_LOG_DIR}/enqueue_generation_job.log"
+
+    if [ $? -eq 0 ]; then
+        echo "[$(date +"%T")][INFO] A comment will be generated at ${HOUR}:${MINUTE}" >> ${GENERAL_LOG_PATH}
+    else
+        echo "[$(date +"%T")][Error] Enqueueing generation job failed" >> ${GENERAL_LOG_PATH}
+    fi
 done
 
 [ ! -z "${GENERATED_TIMES}" ] && (echo "${GENERATED_TIMES}" | tail -1 > "${TIME_GENERATOR_DIR}"/latest_generated_time)
