@@ -11,9 +11,8 @@ def add_arguments(parser):
     parser.add_argument("out_dir", type=str, help="a directory where test.tsv file will be saved")
     return parser
 
-def format_to_mrpc(my_file, target_file, out_dir_path):
+def format_to_mrpc(my_file, target_file, out_dir):
     print("Processing tweet files")
-    out_dir = os.path.join(out_dir_path, "bert_test_data")
     if not os.path.isdir(out_dir):
         os.mkdir(out_dir)
 
