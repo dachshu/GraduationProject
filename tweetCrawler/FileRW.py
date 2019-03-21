@@ -2,6 +2,7 @@ import os
 import re
 import types
 import TweetFilter
+import sys
 
 
 class FileRW:
@@ -55,7 +56,7 @@ class FileRW:
             data_file.truncate()
             data_file.write(''.join(data_list[:idx + 5]))
         except ValueError:
-            print('the data in log file is not in data file')
+            print('the data in log file is not in data file', file=sys.stderr)
 
     def check_last_month(self, data_file, log_file, year, month):
         if log_file.tell() > 0:
@@ -122,7 +123,7 @@ class FileRW:
     def write_tweet_list(self, account, tw_list, year, month):
         dir_path = os.path.join(os.getcwd(), 'tweets', account)
         if not os.path.isdir(dir_path):
-            os.mkdir(dir_path)
+            os.makedirs(dir_path, exist_ok=True)
 
         data_file = open(os.path.join(dir_path, 'data'),
                          'a+', encoding='utf-8')
@@ -159,7 +160,7 @@ class FileRW:
         else:
             log_file.write(date)
 
-        print(account + ':', str(year) + '-' + str(month), '저장됨')
+        print(account + ':', str(year) + '-' + str(month), '저장됨', file=sys.stderr)
 
     def filter_tweets(self, account, form, batch_size=100):
         dir_path = os.path.join(os.getcwd(), 'tweets', account)

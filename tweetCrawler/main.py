@@ -1,22 +1,22 @@
+import click
 import TweetCrawler
 
-tweetCrawler = TweetCrawler.TweetCrawelr()
+@click.command()
+@click.argument('account')
+@click.option('-u', '--update', is_flag=True, help="Update the account's tweets")
+@click.option('-c', '--crawl_from', type=click.DateTime(formats=('%Y-%m',)), help="Do crawling from the specified date.")
+@click.option('-f', '--filter', type=click.Choice(['text','time']), help="Filter to this format.")
+def main(account, update, crawl_from, filter):
+    tweetCrawler = TweetCrawler.TweetCrawelr()
+    if update:
+        tweetCrawler.update(account)
+    if crawl_from is not None:
+        tweetCrawler.crawling(account, crawl_from.year, crawl_from.month)
+    if filter is not None:
+        tweetCrawler.filtering(account, filter)
 
-tweetCrawler.update()
 
-while True:
-    a = input("트윗 크롤링 실행? ")
-    if( a =='y' or a == 'yes'):
-        account = input('account: ')
-        join_year = input('join year: ')
-        join_month = input('join month: ')
-        tweetCrawler.crawling(account, int(join_year), int(join_month))
-    else: break
 
-while True:    
-    b = input("필터링 실행? ")
-    if(b == 'y' or b == 'yes'):
-        account = input('account: ')
-        form = input('form: ')
-        tweetCrawler.filtering(account, form)
-    else: break
+
+if __name__ == '__main__':
+    main()
