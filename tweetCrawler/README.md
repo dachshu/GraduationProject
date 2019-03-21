@@ -5,21 +5,23 @@
 
 HTML 문서에서 트윗들을 저장할 때 일단 문서에서 필요한 데이터들을 전부 저장한다. 따라서 학습 모델에 따라 필요한 데이터들을 뽑아 내는 과정을 추가로 구현했다.
 ## 요구사항
-- [python](https://www.python.org/) 3.5 이상
-- [Selenium with python](http://selenium-python.readthedocs.io/)
+- [python](https://www.python.org/) >= 3.5
+- [Selenium with python](http://selenium-python.readthedocs.io/) >= 3.13.0
 - [Firefox](https://www.mozilla.org/ko/firefox/)
 - [geckodriver](https://github.com/mozilla/geckodriver) (PATH에 등록되어있어야 함.)
-- [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/)
+- [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/) >= 4.6.3
+- [click(python module)](https://click.palletsprojects.com/en/7.x/) >= 7.0
 ## 사용법
-`python3`를 이용해서 `main.py`를 실행시키면 프로그램이 시작된다. `python3 main.py`
+```
+python3 main.py --help
+Usage: main.py [OPTIONS] ACCOUNT
 
-업데이트가 끝나면 트윗을 크롤링하겠냐는 질문이 나온다. y를 선택한 경우 계정과 크롤링 시작 년,월을 입력받는다. n을 선택하면 크롤링 단계를 넘어간다.
-
-크롤링 단계가 지나면 필터링 실행 여부를 묻는다. y를 눌러 필터링을 실행한 경우 저장된 트위터 계정과 필터링 포맷을 입력받는다. n을 선택해 필터링 하지 않는 경우, 프로그램이 종료된다.
-
-필터링 포맷은 `text`, `time` 두가지가 있다. `text`는 트윗의 본문만 추출하고, `time`은 트윗이 작성된 시간을 unix time으로 추출한다.
-
-필터링된 데이터는 `tweets/계정` 아래에 포맷에 따라 각각 `data_text`, `data_time`으로 저장된다.
+Options:
+  -u, --update              Update the account's tweets
+  -c, --crawl_from [%Y-%m]  Do crawling from the specified date.
+  -f, --filter [text|time]  Filter to this format.
+  --help                    Show this message and exit.
+```
 ## 예시
 [PresidentVSKim](https://twitter.com/PresidentVSKim)의 계정을 2011년 6월부터 크롤링해서 필터링 한 결과는 아래와 같이 나온다.
 

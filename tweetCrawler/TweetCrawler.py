@@ -14,12 +14,13 @@ class TweetCrawelr:
         self.base_url = u'http://twitter.com/search?'
         self.fileRW = FileRW.FileRW()
         
-    def update(self):
+    def update(self, account):
         # accounts = [(account, last_year, last_month), ...] tuple list
         accounts = self.fileRW.get_all_account()
-        print(len(accounts))
-        for account in accounts:
-            self.crawling(account[0], int(account[1]), int(account[2]))
+        for acc in accounts:
+            if account == acc[0]:
+                self.crawling(acc[0], int(acc[1]), int(acc[2]))
+                break
 
 
 
