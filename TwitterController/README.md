@@ -11,7 +11,7 @@ Twitter API를 이용해 특정 사용자를 Follow 하거나, 특정 트윗을 
 ## 사용법
 
 ```
-python3 TwitterController.py [follow|retweet|timeline|suggest] [options...]
+python3 TwitterController.py follow|retweet|timeline|suggest [options...]
 ```
 ### 공통 옵션
 * --key KEY_FILE : Twitter API를 사용하기 위한 api key가 담긴 key 파일 경로. 항상 요구되며, 해당 파일에 read permission이 있어야 한다. key 파일의 각 줄엔 다음 토큰 문자열이 있어야 한다.
