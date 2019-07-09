@@ -52,6 +52,13 @@ function exit_if_err() {
     fi
 }
 
+function log_err() {
+    ERR_CODE=$?
+    if [ ${ERR_CODE} -ne 0 ]; then
+        echo "[$(date +"%T")][ERROR] Error has occurred in $@" | tee -a "${GENERAL_LOG_PATH}" 1>&2
+    fi
+}
+
 # exit_if_err 함수에 들어가는 문자열은 에러를 구분하는 용도로 사용되므로
 # 문자열을 변경할 경우 showstat.py 스크립트도 변경된 문자열에 맞춰
 # 수정해야 한다.
@@ -59,12 +66,12 @@ function exit_if_err() {
 # 어제 뉴스 크롤링
 echo "[$(date +"%T")][INFO] Crawling Daum news" >> ${GENERAL_LOG_PATH}
 echo "${CRAWL_DATE}" | "${CRAWLER_DIR}/DaumCrawler.py" "${CRAWLED_DATA_DIR}" -p 4 &> "${DETAIL_K_LOG_DIR}/crawling.log"
-exit_if_err "crawling"
+log_err "crawling"
 
 # NMT용 14일치 학습 데이터 준비
 echo "[$(date +"%T")][INFO] Filtering additional news" >> ${GENERAL_LOG_PATH}
 FILTERED_DATA=$(ls -d ${CRAWLED_DATA_DIR}/* | tail -14 | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_nmt.log")
-exit_if_err "filtering for NMT"
+log_err "filtering for NMT"
 
 # NMT 입력 데이터 생성
 echo "[$(date +"%T")][INFO] making input for the NMT model" >> ${GENERAL_LOG_PATH}
@@ -78,7 +85,7 @@ NMT_TRAINING_PID=$!
 
 # Transformer 데이터 준비
 echo "[$(date +"%T")][INFO] making input for the Transformer model" >> ${GENERAL_LOG_PATH}
-ls -d ${CRAWLED_DATA_DIR}/* | tail -120 | ${SCRIPT_DIR}/news_filter.py | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/transformer_training_input" 2> "${DETAIL_K_LOG_DIR}/transformer_input_making.log"
+find ${CRAWLED_DATA_DIR}/* -type d | sort | tail -120 | ${SCRIPT_DIR}/news_filter.py | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/transformer_training_input" 2> "${DETAIL_K_LOG_DIR}/transformer_input_making.log"
 
 # Transformer 학습
 echo "[$(date +"%T")][INFO] Training the Transformer model" >> ${GENERAL_LOG_PATH}
@@ -86,9 +93,9 @@ ${SCRIPT_DIR}/train_transformer.sh "${RESULT_DIR}/transformer_training_input" "$
 TRANSFORMER_TRAINING_PID=$!
 
 wait ${NMT_TRAINING_PID}
-exit_if_err "NMT training"
+log_err "NMT training"
 wait ${TRANSFORMER_TRAINING_PID}
-exit_if_err "Transformer training"
+log_err "Transformer training"
 
 TIME_GENERATOR_DIR=${PROJECT_DIR}/CommentTimeGenerator
 LATEST_TIME=$(([ -f "${TIME_GENERATOR_DIR}"/latest_generated_time ] && cat "${TIME_GENERATOR_DIR}"/latest_generated_time) || echo "0")
@@ -110,7 +117,7 @@ for t in ${GENERATED_TIMES}; do
         continue
     fi
 
-    ${SCRIPT_DIR}/enq_generation_at_job.sh ${HOUR}:${MINUTE} &>> "${DETAIL_K_LOG_DIR}/enqueue_generation_job.log"
+    ${SCRIPT_DIR}/enq_generation_at_job.sh "${HOUR}:${MINUTE}" &>> "${DETAIL_K_LOG_DIR}/enqueue_generation_job.log"
 
     if [ $? -eq 0 ]; then
         echo "[$(date +"%T")][INFO] A comment will be generated at ${HOUR}:${MINUTE}" >> ${GENERAL_LOG_PATH}
