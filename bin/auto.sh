@@ -70,7 +70,7 @@ log_err "crawling"
 
 # NMT용 14일치 학습 데이터 준비
 echo "[$(date +"%T")][INFO] Filtering additional news" >> ${GENERAL_LOG_PATH}
-FILTERED_DATA=$(ls -d ${CRAWLED_DATA_DIR}/* | tail -14 | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_nmt.log")
+FILTERED_DATA=$(find ${CRAWLED_DATA_DIR}/* -type d | tail -14 | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_nmt.log")
 log_err "filtering for NMT"
 
 # NMT 입력 데이터 생성
