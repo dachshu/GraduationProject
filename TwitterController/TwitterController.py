@@ -4,6 +4,7 @@ import twitter
 import click
 import sys
 import json
+import tweepy
 
 
 @click.group()
@@ -39,15 +40,21 @@ def timeline(key_file, user_name, user_id, num_status):
             "Error: either --user_name or --user_id is required, not both.", file=sys.stderr)
         raise click.Abort()
 
-    api = create_api_instance(key_file)
-    if user_name is None and user_id is None:
-        timeline_data = api.GetHomeTimeline(count=num_status)
-    else:
-        timeline_data = api.GetUserTimeline(
-            screen_name=user_name, user_id=user_id, count=num_status)
+    # python-twitter 로는 자신의 timeline 가져오기가 동작하지 않아서 tweepy로 교체
+    keys = [key.strip() for key in key_file.readlines()]
+    auth = tweepy.OAuthHandler(keys[0], keys[1])
+    auth.set_access_token(keys[2], keys[3])
+    api = tweepy.API(auth)
 
-    print(json.dumps([data.AsJsonString(ensure_ascii=False)
-                      for data in timeline_data], ensure_ascii=False))
+    if user_name is None and user_id is None:
+        timeline_data = api.me().timeline(count=num_status, tweet_mode='extended')
+    else:
+        id = user_name if user_name is not None else user_id
+        timeline_data = api.user_timeline(
+            id, count=num_status, tweet_mode='extended')
+
+    for data in timeline_data:
+        print(vars(data)['full_text'].replace("\n", " "))
 
 
 @cli.command()
@@ -56,47 +63,6 @@ def timeline(key_file, user_name, user_id, num_status):
 def retweet(key_file, tweet_id):
     api = create_api_instance(key_file)
     api.PostRetweet(tweet_id)
-
-
-@cli.command()
-@click.option('--key_file', type=click.File(), required=True, help="A file in which api tokens are")
-@click.option('--get_category', is_flag=True, help="If this flag is set, it prints suggestion categories")
-@click.option('--from_category', 'category', help="Print suggested users from specified category", metavar="CATEGORY")
-def suggest(key_file, get_category, category):
-    api = create_api_instance(key_file)
-
-    if not get_category and category is None:
-        print(
-            "Error: either --get_category or --from_category is required.", file=sys.stderr)
-        raise click.Abort()
-
-    categories = api.GetUserSuggestionCategories()
-
-    if category is not None:
-        print_suggested_users(api, categories, category)
-    else:
-        for cat in categories:
-            print(cat.name)
-
-
-def find_category(categories, category_name):
-    for cat in categories:
-        if cat.name == category_name:
-            selected_cat = cat
-            break
-
-    if selected_cat is None:
-        print("Error: the category doesn't exist.", file=sys.stderr)
-        exit(1)
-
-    return selected_cat
-
-
-def print_suggested_users(api, categories, category_name):
-    cat = find_category(categories, category_name)
-    user_list = api.GetUserSuggestion(cat)
-    for user in user_list:
-        print(user.screen_name)
 
 
 def create_api_instance(key_file):
