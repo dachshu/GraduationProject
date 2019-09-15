@@ -97,10 +97,11 @@ log_err "NMT training"
 wait ${TRANSFORMER_TRAINING_PID}
 log_err "Transformer training"
 
+echo "[$(date +"%T")][INFO] Generating schedules" >> ${GENERAL_LOG_PATH}
 TIME_GENERATOR_DIR=${PROJECT_DIR}/CommentTimeGenerator
 LATEST_TIME=$(([ -f "${TIME_GENERATOR_DIR}"/latest_generated_time ] && cat "${TIME_GENERATOR_DIR}"/latest_generated_time) || echo "0")
+echo "latest time was: ${LATEST_TIME}" >> "${DETAIL_K_LOG_DIR}/generating_schedule.log"
 
-echo "[$(date +"%T")][INFO] Generating schedules" >> ${GENERAL_LOG_PATH}
 GENERATED_TIMES=$("${TIME_GENERATOR_DIR}"/TimeModel.py sample --save_dir "${TIME_GENERATOR_DIR}/save" --seed "${LATEST_TIME}" 2> "${DETAIL_K_LOG_DIR}/generating_schedule.log")
 exit_if_err "schedule generating"
 echo -e "The generated schedules:\n${GENERATED_TIMES}" >> "${DETAIL_K_LOG_DIR}/generating_schedule.log"
@@ -116,6 +117,8 @@ for t in ${GENERATED_TIMES}; do
     if [ $(echo "${TARGET_TIME}<${CURRENT_TIME}" | bc) -eq 1 ]; then
         continue
     fi
+
+    echo "target time: ${HOUR}:${MINUTE}:${SECOND}(raw time: ${t})" >> "${DETAIL_K_LOG_DIR}/generating_schedule.log"
 
     ${SCRIPT_DIR}/enq_generation_at_job.sh "${HOUR}:${MINUTE}" &>> "${DETAIL_K_LOG_DIR}/enqueue_generation_job.log"
 
