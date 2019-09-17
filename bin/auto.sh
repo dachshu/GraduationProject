@@ -85,7 +85,7 @@ NMT_TRAINING_PID=$!
 
 # Transformer 데이터 준비
 echo "[$(date +"%T")][INFO] making input for the Transformer model" >> ${GENERAL_LOG_PATH}
-find ${CRAWLED_DATA_DIR}/* -type d | sort | tail -120 | ${SCRIPT_DIR}/news_filter.py | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/transformer_training_input" 2> "${DETAIL_K_LOG_DIR}/transformer_input_making.log"
+find ${CRAWLED_DATA_DIR}/* -type d | sort | tail -80 | ${SCRIPT_DIR}/news_filter.py | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/transformer_training_input" 2> "${DETAIL_K_LOG_DIR}/transformer_input_making.log"
 
 # Transformer 학습
 echo "[$(date +"%T")][INFO] Training the Transformer model" >> ${GENERAL_LOG_PATH}
