@@ -107,8 +107,11 @@ echo -e "The generated schedules:\n${GENERATED_TIMES}" >> "${DETAIL_K_LOG_DIR}/g
 
 for t in ${GENERATED_TIMES}; do
     HOUR=$(echo "${t}/3600" | bc)
+    HOUR=$(printf "%02d" ${HOUR})
     MINUTE=$(echo "${t}%3600/60" | bc)
+    MINUTE=$(printf "%02d" ${MINUTE})
     SECOND=$(echo "${t}%3600%60" | bc)
+    SECOND=$(printf "%02d" ${SECOND})
 
     TARGET_TIME=$(date --date="${TODAY} ${HOUR}:${MINUTE}:${SECOND}" '+%s')
     CURRENT_TIME=$(date '+%s')
