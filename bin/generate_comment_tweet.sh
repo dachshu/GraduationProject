@@ -9,6 +9,14 @@ function exit_if_err() {
     fi
 }
 
+function print_if_err() {
+    ERR_CODE=$?
+    if [ ${ERR_CODE} -ne 0 ]
+    then
+        echo "[$(date +"%T")][ERROR] Error has occurred in $@" 1>&2
+    fi
+}
+
 TODAY="$(date '+%Y-%m-%d')"
 ###################################################################
 TRANS_MODEL_DIR="../results/saved_transformer_model"
@@ -41,7 +49,7 @@ NMT_OUTPUT=""
 echo ""
 echo "[$(date +"%T")][GENERATE COMMENT OF NMT MODEL]"
 NMT_OUTPUT="$(./generate_nmt_comment.sh "${NEWS_TITLE}")"
-exit_if_err "generate nmt comment"
+print_if_err "generate nmt comment"
 NMT_OUTPUT="$(echo "${NMT_OUTPUT}" |  tail -1)"
 echo "${NMT_OUTPUT}"
 
@@ -50,7 +58,7 @@ TRANSFORMER_OUTPUT=""
 echo ""
 echo "[$(date +"%T")][GENERATE COMMENT OF TRANSFORMER MODEL]"
 TRANSFORMER_OUTPUT="$(./generate_transformer_comment.sh ${TRANS_MODEL_DIR} ${TRANS_VOCAB_FILE} "${NEWS_TITLE}")"
-exit_if_err "generate transformer comment"
+print_if_err "generate transformer comment"
 echo "${TRANSFORMER_OUTPUT}"
 
 # tweet generated comments
@@ -58,9 +66,9 @@ echo ""
 echo "[$(date +"%T")][UPLOAD TWEET]"
 NEWS_NMT_TEXT="$(echo -e "${NEWS_TITLE}\n${NEWS_URL}\n\n${NMT_OUTPUT}")"
 ./upload_tweet.sh "${NEWS_NMT_TEXT}"
-exit_if_err "upload tweet"
+print_if_err "upload tweet"
 ./upload_tweet.sh "${TRANSFORMER_OUTPUT}"
-exit_if_err "upload tweet"
+print_if_err "upload tweet"
 
 echo ""
 echo "[TWEET TEXT]"
