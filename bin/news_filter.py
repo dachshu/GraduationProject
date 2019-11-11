@@ -7,6 +7,7 @@ import sys
 def add_arguments(arg_parser):
     arg_parser.add_argument("archive", nargs="*", help="archives to be filtered")
     arg_parser.add_argument("-c", "--max-comment-num", type=int, default=100, help="a number that commments will be filtered")
+    arg_parser.add_argument("--out-plain-text", action="store_true", help="print comments as plain text, not as json structure")
     return arg_parser
 
 # 걸러진 댓글들을 반환하는 함수
@@ -51,5 +52,10 @@ if __name__ == "__main__":
         parser.error("The input archives are neither directories nor files")
 
     result = [filter_comment(open(archive), args.max_comment_num) for archive in archives]
-    print(json.dumps(result, ensure_ascii=False))
+    if args.out_plain_text:
+        for r in result:
+            comments = [comment.replace("\n", "") for comment in r["comments"]]
+            print("\n".join(comments))
+    else:
+        print(json.dumps(result, ensure_ascii=False))
 
