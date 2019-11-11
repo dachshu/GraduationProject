@@ -69,7 +69,7 @@ echo "[$(date +"%T")][INFO] Crawling Daum news" >> ${GENERAL_LOG_PATH}
 
 # NMT용 14일치 학습 데이터 준비
 echo "[$(date +"%T")][INFO] Filtering additional news" >> ${GENERAL_LOG_PATH}
-FILTERED_DATA=$(find ${CRAWLED_DATA_DIR}/* -type d | sort | head --lines=-1 | tail -14 | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_nmt.log")
+FILTERED_DATA=$(find ${CRAWLED_DATA_DIR}/* -type d | sort | head --lines=-1 | tail -30 | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_nmt.log")
 log_err "filtering for NMT"
 
 # NMT 입력 데이터 생성
@@ -84,7 +84,7 @@ NMT_TRAINING_PID=$!
 
 # Transformer 데이터 준비
 echo "[$(date +"%T")][INFO] making input for the Transformer model" >> ${GENERAL_LOG_PATH}
-find ${CRAWLED_DATA_DIR}/* -type d | sort | head --lines=-1 | tail -80 | ${SCRIPT_DIR}/news_filter.py | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/transformer_training_input" 2> "${DETAIL_K_LOG_DIR}/transformer_input_making.log"
+find ${CRAWLED_DATA_DIR}/* -type d | sort | head --lines=-1 | tail -160 | ${SCRIPT_DIR}/news_filter.py | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/transformer_training_input" 2> "${DETAIL_K_LOG_DIR}/transformer_input_making.log"
 
 TRANSFORMER_MODEL_DATE_FILE="${RESULT_DIR}/../saved_transformer_model/model_created_date"
 # Transformer 이전 모델 제거
