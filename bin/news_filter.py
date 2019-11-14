@@ -6,20 +6,19 @@ import sys
 
 def add_arguments(arg_parser):
     arg_parser.add_argument("archive", nargs="*", help="archives to be filtered")
-    arg_parser.add_argument("--dislike_multiplier", type=float, default=2, help="a number to be multiply to dislike count")
-    arg_parser.add_argument("-p", "--proportion", type=float, default=0.1, help="a proportion of comments to be output")
+    arg_parser.add_argument("-c", "--max-comment-num", type=int, default=100, help="a number that commments will be filtered")
+    arg_parser.add_argument("--out-plain-text", action="store_true", help="print comments as plain text, not as json structure")
     return arg_parser
 
 # 걸러진 댓글들을 반환하는 함수
-def filter_comment(archive_file, dislike_multiplier, proportion):
+def filter_comment(archive_file, max_count):
     archive_dict = json.load(archive_file)
     title = archive_dict["title"].replace("\t", " ")
     comment_list = get_comment_list(archive_dict)
 
     result = sorted(comment_list, key=lambda o: int(o["like"]), reverse=True)
-    result = sorted(result, key=lambda o: int(o["like"]) - int(o["dislike"])*dislike_multiplier, reverse=True)
     result_len = len(result)
-    result_len = min(result_len, result_len*proportion)
+    result_len = min(result_len, max_count)
 
     result_dict = {"title":title, "comments":[cmt["text"].replace("\t", " ") for cmt in result[:int(result_len)]]}
     if len(result_dict["comments"]) == 0:
@@ -52,6 +51,11 @@ if __name__ == "__main__":
     else:
         parser.error("The input archives are neither directories nor files")
 
-    result = [filter_comment(open(archive), args.dislike_multiplier, args.proportion) for archive in archives]
-    print(json.dumps(result, ensure_ascii=False))
+    result = [filter_comment(open(archive), args.max_comment_num) for archive in archives]
+    if args.out_plain_text:
+        for r in result:
+            comments = [comment.replace("\n", "") for comment in r["comments"]]
+            print("\n".join(comments))
+    else:
+        print(json.dumps(result, ensure_ascii=False))
 

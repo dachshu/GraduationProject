@@ -43,14 +43,11 @@ def pull_recommended_accounts(browser, pull_count):
     recommendation_btn = browser.find_element_by_css_selector(
         'aside[aria-label="팔로우 추천"]>a')
 
-    btn_pos = recommendation_btn.location
-    browser.execute_script("window.scrollTo(0, arguments[1]-500);", btn_pos["x"], btn_pos["y"])
-    browser.execute_script("arguments[0].scrollIntoView();", recommendation_btn)
-    time.sleep(1.5)
-
-    recommendation_btn.click()
+    recoomendation_link = recommendation_btn.get_attribute("href")
+    browser.get(recoomendation_link)
     WebDriverWait(browser, 20).until(EC.visibility_of_element_located(
         (By.CSS_SELECTOR, 'div[data-testid="UserCell"]')))
+
     users = browser.find_elements_by_css_selector(
         'div[data-testid="UserCell"]>div')
     names = []
