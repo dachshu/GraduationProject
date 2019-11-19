@@ -21,5 +21,5 @@ find ${CRAWLED_DATA_DIR}/* -type d | sort | tail -1 | ${SCRIPT_DIR}/news_filter.
 
 while read -r user; do
     sed '/^$/d' "${TWEET_DIR}/${user}/data_text" > "${BERT_DATA_DIR}/${user}.twt"
-    python3 "${SCRIPT_DIR}/bert_testdata_preprocess.py" "${BERT_DATA_DIR}/${user}.twt" "${BERT_DATA_DIR}/comments" "${BERT_DATA_DIR}/evel_data/${user}"
+    python3 "${SCRIPT_DIR}/bert_testdata_preprocess.py" "${BERT_DATA_DIR}/${user}.twt" "${BERT_DATA_DIR}/comments" "${BERT_DATA_DIR}/eval_data/${user}"
 done <<< "${RECOMMENDED_USERS}"
