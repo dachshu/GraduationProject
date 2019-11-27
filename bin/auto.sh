@@ -147,3 +147,18 @@ done
 [ ! -z "${GENERATED_TIMES}" ] && (echo "${GENERATED_TIMES}" | tail -1 > "${TIME_GENERATOR_DIR}"/latest_generated_time)
 
 echo "[$(date +"%T")][INFO] Finished training steps" >> ${GENERAL_LOG_PATH}
+
+echo "[$(date +"%T")][INFO] Start crawling tweets of recommended users" >> ${GENERAL_LOG_PATH}
+${SCRIPT_DIR}/make_mrpc_with_tweets.sh
+echo "[$(date +"%T")][INFO] End crawling tweets" >> ${GENERAL_LOG_PATH}
+
+echo "[$(date +"%T")][INFO] Start inference tendencies of users" >> ${GENERAL_LOG_PATH}
+BERT_DIR="${PROJECT_DIR}/bert"
+EVAL_DATA_DIR="${RESULT_DIR}/bert_tweet/eval_data"
+USER_NAMES=$(ls "${EVAL_DATA_DIR}")
+for user in ${USER_NAMES}
+do
+    ${BERT_DIR}/infer_classifier.sh "${EVAL_DATA_DIR}/${user}"
+    INFER_RESULT=$(${SCRIPT_DIR}/score_bert_eval_output.py "${EVAL_DATA_DIR}/${user}/classification_infer_output/test_results.tsv")
+    echo "[$(date +"%T")][INFO] User '${user}' is ${INFER_RESULT}% same" >> ${GENERAL_LOG_PATH}
+done
