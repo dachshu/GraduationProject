@@ -67,20 +67,20 @@ function log_err() {
 echo "[$(date +"%T")][INFO] Crawling Daum news" >> ${GENERAL_LOG_PATH}
 (echo "${CRAWL_DATE}" | ("${CRAWLER_DIR}/DaumCrawler.py" "${CRAWLED_DATA_DIR}" -p 3 &> "${DETAIL_K_LOG_DIR}/crawling.log" && echo "[$(date +"%T")][INFO] Crawling has finished" >> ${GENERAL_LOG_PATH}); log_err "crawling") &
 
-# NMT용 14일치 학습 데이터 준비
-echo "[$(date +"%T")][INFO] Filtering additional news" >> ${GENERAL_LOG_PATH}
-FILTERED_DATA=$(find ${CRAWLED_DATA_DIR}/* -type d | sort | head --lines=-1 | tail -30 | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_nmt.log")
-log_err "filtering for NMT"
+## NMT용 14일치 학습 데이터 준비
+#echo "[$(date +"%T")][INFO] Filtering additional news" >> ${GENERAL_LOG_PATH}
+#FILTERED_DATA=$(find ${CRAWLED_DATA_DIR}/* -type d | sort | head --lines=-1 | tail -30 | ${SCRIPT_DIR}/news_filter.py 2> "${DETAIL_K_LOG_DIR}/filtering_for_nmt.log")
+#log_err "filtering for NMT"
 
-# NMT 입력 데이터 생성
-echo "[$(date +"%T")][INFO] making input for the NMT model" >> ${GENERAL_LOG_PATH}
-echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/nmt_training_input"
+## NMT 입력 데이터 생성
+#echo "[$(date +"%T")][INFO] making input for the NMT model" >> ${GENERAL_LOG_PATH}
+#echo "${FILTERED_DATA}" | ${SCRIPT_DIR}/make_input_for_nmt.py "${RESULT_DIR}/nmt_training_input"
 
-# NMT 학습
-echo "[$(date +"%T")][INFO] Training the NMT model" >> ${GENERAL_LOG_PATH}
-# NMT가 학습과정을 stdout으로 출력하기 때문에 stdout과 stderr를 모두 log로 출력한다.
-${SCRIPT_DIR}/train_nmt.sh "${RESULT_DIR}/nmt_training_input" "${NMT_MODEL_DIR}" --gpu_id 1 &> "${DETAIL_K_LOG_DIR}/training_nmt.log" &
-NMT_TRAINING_PID=$!
+## NMT 학습
+#echo "[$(date +"%T")][INFO] Training the NMT model" >> ${GENERAL_LOG_PATH}
+## NMT가 학습과정을 stdout으로 출력하기 때문에 stdout과 stderr를 모두 log로 출력한다.
+#${SCRIPT_DIR}/train_nmt.sh "${RESULT_DIR}/nmt_training_input" "${NMT_MODEL_DIR}" --gpu_id 1 &> "${DETAIL_K_LOG_DIR}/training_nmt.log" &
+#NMT_TRAINING_PID=$!
 
 # Transformer 데이터 준비
 echo "[$(date +"%T")][INFO] making input for the Transformer model" >> ${GENERAL_LOG_PATH}
@@ -104,8 +104,8 @@ echo "[$(date +"%T")][INFO] Training the Transformer model" >> ${GENERAL_LOG_PAT
 ${SCRIPT_DIR}/train_transformer.sh "${RESULT_DIR}/transformer_training_input" "${RESULT_DIR}/../saved_transformer_model" --epoch 5 2> "${DETAIL_K_LOG_DIR}/training_transformer.log" &
 TRANSFORMER_TRAINING_PID=$!
 
-wait ${NMT_TRAINING_PID}
-log_err "NMT training"
+#wait ${NMT_TRAINING_PID}
+#log_err "NMT training"
 wait ${TRANSFORMER_TRAINING_PID}
 log_err "Transformer training"
 
