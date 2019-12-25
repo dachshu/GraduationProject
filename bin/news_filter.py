@@ -16,7 +16,7 @@ def filter_comment(archive_file, max_count):
     title = archive_dict["title"].replace("\t", " ")
     comment_list = get_comment_list(archive_dict)
 
-    result = sorted(comment_list, key=lambda o: int(o["like"]), reverse=True)
+    result = sorted(comment_list, key=lambda o: int(o["like"])-int(o["dislike"]), reverse=True)
     result_len = len(result)
     result_len = min(result_len, max_count)
 
