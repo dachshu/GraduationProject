@@ -184,13 +184,13 @@ class DaumCrawler:
             data['like'] = int(comment.find_element_by_css_selector('button.btn_recomm span.num_txt').text)
             data['dislike'] = int(comment.find_element_by_css_selector('button.btn_oppose span.num_txt').text)
 
-            if DaumCrawler._open_reply(comment):
-                data['reply'] = {}
-                reply_list = comment.find_elements_by_css_selector('ul.list_reply li')
-                for reply in reply_list:
-                    r_data = DaumCrawler._parse_comment(reply, is_reply=True)
-                    if r_data:
-                        data['reply'][r_data['id']] = r_data
+            # if DaumCrawler._open_reply(comment):
+                # data['reply'] = {}
+                # reply_list = comment.find_elements_by_css_selector('ul.list_reply li')
+                # for reply in reply_list:
+                    # r_data = DaumCrawler._parse_comment(reply, is_reply=True)
+                    # if r_data:
+                        # data['reply'][r_data['id']] = r_data
 
         return data
 
