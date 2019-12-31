@@ -34,7 +34,7 @@ def get_comment_list(archive_dict):
 def filter_stupid_news(news_file_path):
     archive = json.load(open(news_file_path))
     man_proportion = archive.get("man_proportion")
-    if man_proportion is None or int(man_proportion[:-1]) < 60:
+    if man_proportion is None or int(man_proportion[:-1]) < 70:
         return False
     
     age50_proportion = archive.get("age50_proportion")
@@ -42,7 +42,7 @@ def filter_stupid_news(news_file_path):
     if age50_proportion is None or age60_proportion is None:
         return False
 
-    if int(age50_proportion[:-1]) + int(age60_proportion[:-1]) < 60:
+    if int(age50_proportion[:-1]) + int(age60_proportion[:-1]) < 50:
         return False
     
     return True
