@@ -16,7 +16,11 @@ from selenium.webdriver.support import expected_conditions as EC
 SCRIPT_PATH = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 def get_new_browser():
-    return webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
+    options = webdriver.ChromeOptions()
+    options.add_argument('headless')
+    #return webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
+    return webdriver.Chrome(chrome_options=options
+                            ,executable_path='/home/cjy/GraduationProject/crawler/chromedriver') 
 
 class DaumCrawler:
     def __init__(self):
@@ -55,7 +59,8 @@ class DaumCrawler:
             news['comment'] = {}
 
             DaumCrawler._scroll_to_end(browser)
-            cmt_list = browser.find_elements_by_xpath("//ul[contains(@class, 'list_comment')]//li")
+            cmt_list = browser.find_elements_by_css_selector("ul.list_comment > li")
+            assert len(cmt_list) > 0, "the comment list has no comment"
             for _, cmt in enumerate(cmt_list):
                 data = DaumCrawler._parse_comment(cmt)
                 if data:
@@ -89,23 +94,20 @@ class DaumCrawler:
 
     @staticmethod
     def _scroll_to_end(browser):
-        try:
-            more_box = browser.find_element_by_css_selector("div.cmt_box>div.alex_more a")
-            box_loc = more_box.location
-            while True:
-                more_box.click()
-                start_time = time.time()
-                while len(more_box.find_elements_by_tag_name('span')) < 2:
-                    if time.time()-start_time >= 10:
-                        return
-                    time.sleep(0.2)
-                    more_box = browser.find_element_by_css_selector("div.cmt_box>div.alex_more a")
-                new_loc = more_box.location
-                if box_loc == new_loc:
+        more_box = browser.find_element_by_css_selector("div.cmt_box>div.alex_more a")
+        box_loc = more_box.location
+        while True:
+            more_box.click()
+            start_time = time.time()
+            while len(more_box.find_elements_by_tag_name('span')) < 2:
+                if time.time()-start_time >= 10:
                     return
-                box_loc = new_loc
-        except (NoSuchElementException, StaleElementReferenceException):
-            return
+                time.sleep(0.2)
+                more_box = browser.find_element_by_css_selector("div.cmt_box>div.alex_more a")
+            new_loc = more_box.location
+            if box_loc == new_loc:
+                return
+            box_loc = new_loc
 
     @staticmethod
     def _open_reply(comment):
@@ -181,8 +183,8 @@ class DaumCrawler:
             data['time'] = cmt_time
 
         if not is_reply:
-            data['like'] = int(comment.find_element_by_css_selector('button.btn_recomm span.num_txt').text)
-            data['dislike'] = int(comment.find_element_by_css_selector('button.btn_oppose span.num_txt').text)
+            data['like'] = int(comment.find_elements_by_css_selector('button.btn_recomm span.num_txt')[-1].text)
+            data['dislike'] = int(comment.find_elements_by_css_selector('button.btn_oppose span.num_txt')[-1].text)
 
             # if DaumCrawler._open_reply(comment):
                 # data['reply'] = {}
@@ -234,7 +236,7 @@ def save_result(result, total_num, save_path):
     print("Crawled %s, %d/%d has done" % (url, completed_num, total_num), file=sys.stderr)
 
 if __name__ == '__main__':
-    os.environ['MOZ_HEADLESS'] = '1'
+    #os.environ['MOZ_HEADLESS'] = '1'
     args = get_arguments()
     
     crawler = DaumCrawler()
