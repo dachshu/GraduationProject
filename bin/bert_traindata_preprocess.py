@@ -4,12 +4,41 @@ import os
 from random import shuffle
 import sys
 import argparse
+import random
 
 def add_arguments(parser):
     parser.add_argument("tweet_file_1", type=str, help="a file for making training and dev data")
     parser.add_argument("tweet_file_2", type=str, help="another file for making training and dev data")
     parser.add_argument("out_dir", type=str, help="a directory where train.tsv, dev.tsv files will be saved")
     return parser
+
+def get_random_tweets(list1, list2):
+    if len(list1) == 0:
+        if len(list2) < 2:
+            return None
+        else:
+            return (1, [list2.pop(), list2.pop()])
+    if len(list2) == 0:
+        if len(list1) < 2:
+            return None
+        else: 
+            return (1, [list1.pop(), list1.pop()])
+
+    if len(list1) > 1 and len(list2) > 1:
+        flag = int(random.uniform(0,4))
+    else:
+        flag = 0
+
+    if flag < 2:
+        retval = [list1.pop(), list2.pop()]
+        shuffle(retval)
+        return (0, retval)
+    elif flag == 2:
+        return (1, [list1.pop(), list1.pop()])
+    else:
+        return (1, [list2.pop(), list2.pop()])
+
+
 
 def format_to_mrpc(tweets_file1, tweets_file2, out_dir):
     print("Processing tweet files")
@@ -32,22 +61,22 @@ def format_to_mrpc(tweets_file1, tweets_file2, out_dir):
         tweets2 = tweet2_fh.readlines()
         shuffle(tweets2)
         loop_cnt = len(tweets1) if len(tweets1) < len(tweets2) else len(tweets2)
-        loop_cnt = int(loop_cnt / 4)
+        loop_cnt = loop_cnt*2
         ids = []
-        for i in range(loop_cnt * 4 * 2):
+        for i in range(loop_cnt):
             ids.append(i)
         shuffle(ids)
 
         tweet_data = []
-        for i in range(loop_cnt * 4):
-            tweet_data.append("%s\t%s\t%s\t%s\t%s\n" % (0, ids[i], ids[i + 1], tweets1[i].replace('\n', '').replace('\t', ''), tweets2[i].replace('\n', '').replace('\t', '')))
-            tweet_data.append("%s\t%s\t%s\t%s\t%s\n" % (0, ids[i + 2], ids[i + 3], tweets2[i + 1].replace('\n', '').replace('\t', ''), tweets1[i + 1].replace('\n', '').replace('\t', '')))
-            tweet_data.append("%s\t%s\t%s\t%s\t%s\n" % (1, ids[i + 4], ids[i + 5], tweets1[i + 2].replace('\n', '').replace('\t', ''), tweets1[i + 3].replace('\n', '').replace('\t', '')))
-            tweet_data.append("%s\t%s\t%s\t%s\t%s\n" % (1, ids[i + 6], ids[i + 7], tweets2[i + 2].replace('\n', '').replace('\t', ''), tweets2[i + 3].replace('\n', '').replace('\t', '')))
-        shuffle(tweet_data)
+        while True:
+            tweet_pair = get_random_tweets(tweets1, tweets2) # type: (label, [tw1, tw2])
+            if tweet_pair is None:
+                break
 
-        num_train_data = int((loop_cnt*4)*(10/11))
-        num_dev_data = loop_cnt*4 - num_train_data
+            tweet_data.append("%s\t%s\t%s\t%s\t%s\n" % (tweet_pair[0], ids.pop(), ids.pop(), tweet_pair[1][0].replace('\n', ' ').replace('\t', ' '), tweet_pair[1][1].replace('\n', ' ').replace('\t', ' ')))
+
+        num_train_data = int(len(tweet_data)*0.9)
+        num_dev_data = len(tweet_data)-num_train_data
         for i in range(num_train_data):
             train_fh.write(tweet_data[i])
         for i in range(num_dev_data):
