@@ -20,7 +20,7 @@ def filter_comment(archive_file, max_count):
     result_len = len(result)
     result_len = min(result_len, max_count)
 
-    result_dict = {"title":title, "comments":[cmt["text"].replace("\t", " ") for cmt in result[:int(result_len)]]}
+    result_dict = {"title":title, "comments":[cmt["text"].replace("\t", " ").replace("\n", " ") for cmt in result[:int(result_len)]]}
     if len(result_dict["comments"]) == 0:
         print("WARNING: a news item(\'%s\', in \'%s\') has no comments" % (title, archive_file.name), file=sys.stderr)
     return result_dict

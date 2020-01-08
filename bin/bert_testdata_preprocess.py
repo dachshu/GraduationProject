@@ -36,7 +36,7 @@ def format_to_mrpc(my_file, target_file, out_dir):
 
         for i in range(loop_cnt):
             test_fh.write("%d\t%s\t%s\t%s\t%s\n" % (i, ids[2*i], ids[2*i+1], \
-                my_tweets[i].replace('\n', '').replace('\t', ''), target_tweets[i].replace('\n', '').replace('\t', '')))
+                my_tweets[i].replace('\n', ' ').replace('\t', ' '), target_tweets[i].replace('\n', ' ').replace('\t', ' ')))
 
     print("\tCompleted!")
 
