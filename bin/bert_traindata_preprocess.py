@@ -60,7 +60,7 @@ def format_to_mrpc(tweets_file1, tweets_file2, out_dir):
         shuffle(tweets1)
         tweets2 = tweet2_fh.readlines()
         shuffle(tweets2)
-        loop_cnt = len(tweets1) if len(tweets1) < len(tweets2) else len(tweets2)
+        loop_cnt = len(tweets2) if len(tweets1) < len(tweets2) else len(tweets1)
         loop_cnt = loop_cnt*2
         ids = []
         for i in range(loop_cnt):
@@ -74,6 +74,7 @@ def format_to_mrpc(tweets_file1, tweets_file2, out_dir):
                 break
 
             tweet_data.append("%s\t%s\t%s\t%s\t%s\n" % (tweet_pair[0], ids.pop(), ids.pop(), tweet_pair[1][0].replace('\n', ' ').replace('\t', ' '), tweet_pair[1][1].replace('\n', ' ').replace('\t', ' ')))
+        shuffle(tweet_data)
 
         num_train_data = int(len(tweet_data)*0.9)
         num_dev_data = len(tweet_data)-num_train_data
