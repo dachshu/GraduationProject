@@ -17,7 +17,7 @@ RECOMMENDED_USERS=$("${TWITTER_CONTROLLER_DIR}/get_recommend_accounts.py" -c 3 "
 echo "${RECOMMENDED_USERS}" | parallel "cd ${TWEET_CRAWLER_DIR} && python3 \"${TWEET_CRAWLER_DIR}/main.py\" -c ${TARGET_DATE} {} && python3 \"${TWEET_CRAWLER_DIR}/main.py\" -f text {}"
 
 mkdir -p "${BERT_DATA_DIR}"
-find ${CRAWLED_DATA_DIR}/* -type d | sort | tail -1 | ${SCRIPT_DIR}/news_filter.py -c 10 --out-plain-text > "${BERT_DATA_DIR}/comments"
+find ${CRAWLED_DATA_DIR}/* -type d | sort | tail -10 | ${SCRIPT_DIR}/news_filter.py -c 10 --out-plain-text > "${BERT_DATA_DIR}/comments"
 
 while read -r user; do
     sed '/^$/d' "${TWEET_DIR}/${user}/data_text" > "${BERT_DATA_DIR}/${user}.twt"
