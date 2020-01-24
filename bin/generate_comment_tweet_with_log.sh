@@ -19,7 +19,7 @@ cd "${PROJECT_DIR}/bin"
 
 # get recommended users and check they are similar to me
 echo "[$(date +"%T")][INFO] Start crawling tweets of recommended users" >> ${DETAIL_LOG_PATH}
-${SCRIPT_DIR}/make_mrpc_with_tweets.sh
+${SCRIPT_DIR}/make_mrpc_with_tweets.sh >> ${DETAIL_LOG_PATH}
 echo "[$(date +"%T")][INFO] End crawling tweets" >> ${DETAIL_LOG_PATH}
 
 echo "[$(date +"%T")][INFO] Start inference tendencies of users" >> ${DETAIL_LOG_PATH}
