@@ -21,23 +21,32 @@ def read_auth_info(auth_file):
 
 
 def login_on_twitter(browser, id, pw):
-    WebDriverWait(browser, 20).until(EC.visibility_of_element_located(
-        (By.CSS_SELECTOR, 'input.js-password-field')))
-    WebDriverWait(browser, 20).until(EC.element_to_be_clickable(
-        (By.CSS_SELECTOR, 'button.submit')))
+    WebDriverWait(browser, 20).until(EC.presence_of_all_elements_located(
+        (By.CSS_SELECTOR, 'input[name="session[password]"]')))
 
-    id_field = browser.find_element_by_css_selector('input.js-username-field')
-    pw_field = browser.find_element_by_css_selector('input.js-password-field')
-    submit_btn = browser.find_element_by_css_selector('button.submit')
+    id_fields = browser.find_elements_by_css_selector('input[name="session[username_or_email]"]')
+    pw_fields = browser.find_elements_by_css_selector('input[name="session[password]"]')
+    submit_btns = browser.find_elements_by_xpath("//*[text()='로그인']")
 
     time.sleep(1.5)
-    id_field.send_keys(id)
+    for id_elem in id_fields:
+        if id_elem.is_displayed():
+            id_elem.send_keys(id)
+            break
+    
     time.sleep(1.5)
-    pw_field.send_keys(pw)
-    time.sleep(1.5)
-    submit_btn.click()
-    time.sleep(1.5)
-    WebDriverWait(browser, 20).until(EC.element_to_be_clickable(
+    for pw_elem in pw_fields:
+        if pw_elem.is_displayed():
+            pw_elem.send_keys(pw)
+            break
+
+    for submit_elem in submit_btns:
+        if submit_elem.is_displayed():
+            if submit_elem.tag_name in ["span", "button"]:
+                submit_elem.click()
+                break
+    
+    WebDriverWait(browser, 20).until(EC.presence_of_all_elements_located(
         (By.CSS_SELECTOR, 'aside[aria-label="팔로우 추천"]>a')))
 
 
@@ -76,7 +85,6 @@ def main(auth_file, pull_count):
             print(name)
     finally:
         browser.quit()
-
 
 if __name__ == "__main__":
     main()
