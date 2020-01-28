@@ -34,7 +34,9 @@ def login_on_twitter(browser, id, pw):
     id_field.send_keys(id)
     time.sleep(1.5)
     pw_field.send_keys(pw)
+    time.sleep(1.5)
     submit_btn.click()
+    time.sleep(1.5)
     WebDriverWait(browser, 20).until(EC.element_to_be_clickable(
         (By.CSS_SELECTOR, 'aside[aria-label="팔로우 추천"]>a')))
 
@@ -64,13 +66,16 @@ def pull_recommended_accounts(browser, pull_count):
 @click.option('--pull-count', '-c', type=click.IntRange(1,30), default=5)
 def main(auth_file, pull_count):
     os.environ["MOZ_HEADLESS"]='1'
-    browser = webdriver.Firefox()
-    browser.get(twitter_login_url)
-    id, pw = read_auth_info(auth_file)
-    login_on_twitter(browser, id, pw)
-    names = pull_recommended_accounts(browser, pull_count)
-    for name in names[:min([len(names), pull_count])]:
-        print(name)
+    try:
+        browser = webdriver.Firefox()
+        browser.get(twitter_login_url)
+        id, pw = read_auth_info(auth_file)
+        login_on_twitter(browser, id, pw)
+        names = pull_recommended_accounts(browser, pull_count)
+        for name in names[:min([len(names), pull_count])]:
+            print(name)
+    finally:
+        browser.quit()
 
 
 if __name__ == "__main__":
