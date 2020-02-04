@@ -33,7 +33,7 @@ def follow(key_file, user_name, user_id, unfollow):
 @click.option('--key_file', type=click.File(), required=True, help="A file in which api tokens are")
 @click.option('--user_name', '-u', help="Twitter screen name", metavar="USER_NAME")
 @click.option('--user_id', help="Twitter numeric id", metavar="USER_ID(INTEGER)")
-@click.option('--num_status', type=click.INT, default=20, help="A number of status to be printed. this may not be greatr than 200.")
+@click.option('--num_status', '-n', type=click.INT, default=20, help="A number of status to be printed. this may not be greatr than 200.")
 def timeline(key_file, user_name, user_id, num_status):
     if user_name is not None and user_id is not None:
         print(
