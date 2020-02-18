@@ -16,11 +16,10 @@ from selenium.webdriver.support import expected_conditions as EC
 SCRIPT_PATH = os.path.dirname(os.path.realpath(sys.argv[0]))
 
 def get_new_browser():
-    options = webdriver.ChromeOptions()
-    options.add_argument('headless')
-    #return webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
-    return webdriver.Chrome(chrome_options=options
-                            ,executable_path='/home/cjy/GraduationProject/crawler/chromedriver') 
+    # options = webdriver.ChromeOptions()
+    # options.add_argument('headless')
+    # return webdriver.Chrome(chrome_options=options, executable_path='/usr/local/bin/chromedriver') 
+    return webdriver.Firefox(executable_path="/usr/local/bin/geckodriver")
 
 class DaumCrawler:
     def __init__(self):
@@ -42,6 +41,7 @@ class DaumCrawler:
             self.browser.quit()
             self.browser = get_new_browser()
             return []
+
 
     @staticmethod
     def crawl_url(browser, url):
@@ -236,7 +236,7 @@ def save_result(result, total_num, save_path):
     print("Crawled %s, %d/%d has done" % (url, completed_num, total_num), file=sys.stderr)
 
 if __name__ == '__main__':
-    #os.environ['MOZ_HEADLESS'] = '1'
+    os.environ['MOZ_HEADLESS'] = '1'
     args = get_arguments()
     
     crawler = DaumCrawler()
