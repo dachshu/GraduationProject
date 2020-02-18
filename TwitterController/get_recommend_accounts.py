@@ -24,9 +24,11 @@ def login_on_twitter(browser, id, pw):
     WebDriverWait(browser, 20).until(EC.presence_of_all_elements_located(
         (By.CSS_SELECTOR, 'input[name="session[password]"]')))
 
+
     id_fields = browser.find_elements_by_css_selector('input[name="session[username_or_email]"]')
     pw_fields = browser.find_elements_by_css_selector('input[name="session[password]"]')
-    submit_btns = browser.find_elements_by_xpath("//*[text()='로그인']")
+    submit_btns = browser.find_elements_by_xpath("//*[text()='Log in']")
+
 
     time.sleep(1.5)
     for id_elem in id_fields:
