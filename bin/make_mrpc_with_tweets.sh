@@ -14,7 +14,10 @@ TARGET_DATE=$(date --date='6 month ago' +'%Y-%m')
 
 RECOMMENDED_USERS=$("${TWITTER_CONTROLLER_DIR}/get_recommend_accounts.py" -c 3 "${TWITTER_CONTROLLER_DIR}/twitter_auth")
 
-echo "${RECOMMENDED_USERS}" | parallel "cd ${TWEET_CRAWLER_DIR} && python3 \"${TWEET_CRAWLER_DIR}/main.py\" -c ${TARGET_DATE} {} && python3 \"${TWEET_CRAWLER_DIR}/main.py\" -f text {}"
+echo "${RECOMMENDED_USERS}"
+
+echo "${RECOMMENDED_USERS}" | parallel "cd ${TWEET_CRAWLER_DIR} && python3 \"${TWEET_CRAWLER_DIR}/main.py\" -c ${TARGET_DATE} {}"
+echo "${RECOMMENDED_USERS}" | parallel "cd ${TWEET_CRAWLER_DIR} && python3 \"${TWEET_CRAWLER_DIR}/main.py\" -f text {}"
 
 mkdir -p "${BERT_DATA_DIR}"
 find ${CRAWLED_DATA_DIR}/* -type d | sort | tail -10 | ${SCRIPT_DIR}/news_filter.py -c 10 --out-plain-text > "${BERT_DATA_DIR}/comments"
