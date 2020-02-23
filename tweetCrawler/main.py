@@ -5,7 +5,7 @@ import TweetCrawler
 @click.argument('account')
 @click.option('-u', '--update', is_flag=True, help="Update the account's tweets")
 @click.option('-c', '--crawl_from', type=click.DateTime(formats=('%Y-%m',)), help="Do crawling from the specified date.")
-@click.option('-f', '--filter', type=click.Choice(['text','time']), help="Filter to this format.")
+@click.option('-f', '--filter', type=click.Choice(['text','time', 'time_text']), help="Filter to this format.")
 def main(account, update, crawl_from, filter):
     tweetCrawler = TweetCrawler.TweetCrawelr()
     if update:

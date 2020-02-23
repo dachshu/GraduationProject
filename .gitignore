@@ -28,3 +28,5 @@ models/*
 models/official/transformer/model*
 models/official/transformer/data*/
 models/official/transformer/test_data/
+TwitterController/twitter_auth*
+TwitterController/twitter_key*

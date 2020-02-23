@@ -28,15 +28,18 @@ def format_to_mrpc(my_file, target_file, out_dir):
         my_tweets = my_fh.readlines()
         target_tweets = target_fh.readlines()
 
-        loop_cnt = len(my_tweets) if len(my_tweets) < len(target_tweets) else len(target_tweets)
+        loop_cnt = len(my_tweets) * len(target_tweets)
         ids = []
-        for i in range(loop_cnt * 2):
+        for i in range(loop_cnt*2):
             ids.append(i)
         shuffle(ids)
 
-        for i in range(loop_cnt):
-            test_fh.write("%d\t%s\t%s\t%s\t%s\n" % (i, ids[2*i], ids[2*i+1], \
-                my_tweets[i].replace('\n', ' ').replace('\t', ' '), target_tweets[i].replace('\n', ' ').replace('\t', ' ')))
+        id_cnt = 0
+        for my_tweet in my_tweets:
+            for target_tweet in target_tweets:
+                test_fh.write("%d\t%s\t%s\t%s\t%s\n" % ((id_cnt//2) + 1, ids[id_cnt], ids[id_cnt+1], \
+                my_tweet.replace('\n', ' ').replace('\t', ' '), target_tweet.replace('\n', ' ').replace('\t', ' ')))
+                id_cnt = id_cnt + 2
 
     print("\tCompleted!")
 

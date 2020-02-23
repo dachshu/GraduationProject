@@ -23,4 +23,8 @@ class TweetFilter:
     def filtering(self, tweets, form):
         if form == 'text': return self.textFiltering(tweets)
         elif form == 'time': return self.timeFiltering(tweets)
+        elif form == 'time_text':
+            times = self.timeFiltering(tweets)
+            texts = self.textFiltering(tweets)
+            return [times[i].strip() + ' ' + text for (i, text) in enumerate(texts)]
         else: return None

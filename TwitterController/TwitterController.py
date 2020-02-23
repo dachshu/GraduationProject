@@ -33,7 +33,7 @@ def follow(key_file, user_name, user_id, unfollow):
 @click.option('--key_file', type=click.File(), required=True, help="A file in which api tokens are")
 @click.option('--user_name', '-u', help="Twitter screen name", metavar="USER_NAME")
 @click.option('--user_id', help="Twitter numeric id", metavar="USER_ID(INTEGER)")
-@click.option('--num_status', '-n', type=click.INT, default=20, help="A number of status to be printed. this may not be greatr than 200.")
+@click.option('--num_status', '-n', type=click.INT, default=20, help="A number of status to be printed. this should not be greater than 200.")
 def timeline(key_file, user_name, user_id, num_status):
     if user_name is not None and user_id is not None:
         print(
@@ -55,6 +55,18 @@ def timeline(key_file, user_name, user_id, num_status):
 
     for data in timeline_data:
         print(vars(data)['full_text'].replace("\n", " "))
+
+
+@cli.command()
+@click.option('--key_file', type=click.File(), required=True, help="A file in which api tokens are")
+@click.option('--num_status', '-n', type=click.INT, default=20, help="A number of status to be printed. this should not be greater than 200.")
+def home_timeline(key_file, num_status):
+    api = create_api_instance(key_file)
+    tweet_list = api.GetHomeTimeline(count=num_status)
+    for tweet in tweet_list:
+        text = tweet.full_text if tweet.full_text else tweet.text
+        print("{0} {1} {2}".format(tweet.id, tweet.created_at_in_seconds, text.replace("\t", " ").replace("\n", " ")))
+    print()
 
 
 @cli.command()
