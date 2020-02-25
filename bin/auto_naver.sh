@@ -61,7 +61,7 @@ function log_err() {
 
 # 어제 뉴스 크롤링
 echo "[$(date +"%T")][INFO] Crawling Naver news" >> ${GENERAL_LOG_PATH}
-(echo "${CRAWL_DATE}" | ("${CRAWLER_DIR}/NaverCrawler.py" "${CRAWLED_DATA_DIR}" -p 3 &> "${DETAIL_K_LOG_DIR}/crawling.log" && echo "[$(date +"%T")][INFO] Crawling has finished" >> ${GENERAL_LOG_PATH}); log_err "crawling") &
+(("${CRAWLER_DIR}/NaverCrawler.py" "${CRAWLED_DATA_DIR}" "${CRAWL_DATE}" &> "${DETAIL_K_LOG_DIR}/crawling.log" && echo "[$(date +"%T")][INFO] Crawling has finished" >> ${GENERAL_LOG_PATH}); log_err "crawling") &
 
 ## NMT용 14일치 학습 데이터 준비
 #echo "[$(date +"%T")][INFO] Filtering additional news" >> ${GENERAL_LOG_PATH}
